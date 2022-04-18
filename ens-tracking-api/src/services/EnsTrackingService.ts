@@ -1,4 +1,5 @@
 import { LoggerConfig } from "../config/LoggerConfig";
+import pg from "pg";
 
 interface IDependencies {
   loggerConfig: LoggerConfig;
@@ -12,7 +13,6 @@ export class EnsTrackingService {
   }
 
   resolve(ensNode: string) {
-
   }
 
   resolveMany(ensNodes: string[]) {
