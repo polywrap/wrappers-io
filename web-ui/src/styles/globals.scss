@@ -1,0 +1,283 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 80%;
+}
+
+@media (min-width: 768px) {
+  html {
+      font-size: 85%;
+  }
+}
+@media (min-width: 991px) {
+  html {
+      font-size: 90%;
+  }
+}
+@media (min-width: 1279px) {
+  html {
+      font-size: 100%;
+  }
+}
+@media (min-width: 1440px) {
+  html {
+      font-size: 105%;
+  }
+}
+
+@import "~bootstrap/scss/bootstrap";
+@import "./table.scss";
+@import "./widget.scss";
+@import "./text.scss";
+@import "./markdown.scss";
+@import url('https://fonts.googleapis.com/css?family=Varela+Round');
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background: #23232F;
+  padding: 0;
+  margin: 0;
+  color: #fff;
+  font-family: 'Varela Round', sans-serif;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+html, body {
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.form-control {
+  background-color: transparent;
+  height: 40px;
+  padding: 0;
+  border-radius: 0;
+  color: #fff;
+
+  // border: none;
+  // border-bottom: 1px solid #6c757d;
+  
+  border: 1px solid #6c757d;
+  padding: 5px;
+}
+
+.form-control:focus {
+  background-color: transparent;
+  outline: 0;
+  box-shadow: none;
+  color: #fff;
+}
+
+.clickable {
+  cursor: pointer;
+  &:hover {
+    background-color: #7d9e3063;
+  }
+}
+
+.card-header {
+  border-bottom: 1px solid #909090;
+}
+
+.btn-success {
+  background-color: #50755861;
+}
+
+.btn-danger {
+  background-color: #6b2c148c;
+  border-color: #cc3241;
+}
+
+.btn-info {
+  background-color: #1a454c;
+  border-color: #6dc6d4;
+}
+
+.modal-content {
+  background: linear-gradient(
+      49.21deg, 
+      rgba(127, 127, 213, 0.2) 19.87%, 
+      rgba(134, 168, 231, 0.2) 58.46%,
+      rgba(145, 234, 228, 0.2) 97.05%
+    );  
+}
+
+::placeholder { 
+  color: #AAAAAA !important;
+  opacity: 1; 
+}
+
+.drag-area {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 10px;
+  border: 2px dashed #49a7ff;
+}
+
+.drop-hover {
+  background-color: #25883b;
+  border: 2px dashed #b5bcff;
+}
+
+.inner-widget {
+  .head {
+    padding: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  .body {
+    background: #292b4f;
+    padding: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+}
+
+.pad {
+  padding: 10px
+}
+
+.round {
+  border-radius: 5px;
+}
+
+.success-back {
+  background: #04d10285;
+}
+
+.page {
+  .widgets-container {
+    display: flex;
+    justify-content: space-between;
+
+    .second-column {
+      margin-left: 20px;
+      flex-grow: 1;
+    }
+  }
+}
+
+.nav-link {
+  color: #ffffff;
+  &:hover {
+    color: #41d0ff;
+  }
+}
+
+.navbar {
+  background: #1f2b32;
+}
+
+.navbar-brand {
+  color: #ffffff;
+}
+
+select {
+  option {
+    background: #255a61;
+  }
+} 
+
+.LoadedWrapperView {
+  .download {
+    margin-top: 20px;
+  }
+}
+
+.Tabs {
+  .nav-item {
+    :hover {
+      background: #1b3363;
+    }
+    &.active {
+      background: #1b3363;
+    }
+    cursor: pointer;
+    background: #7177ff8c;
+    .nav-link {
+      color: #ffffff;
+    }
+  }
+}
+
+.PublishWrapperModal {
+  .registry-section {
+    margin: 10px;
+  }
+  select {
+    option {
+      background: #255a61;
+    }
+  } 
+}
+
+.code-back {
+  background: #2b2b2b;
+}
+
+.padding-0 {
+  padding: 0 !important;
+}
+
+.margin-0 {
+  padding: 0 !important;
+}
+
+.padding-20 {
+  padding: 20px !important;
+}
+
+.medium {
+  max-width: 600px;
+}
+
+pre {
+  margin-top: 0 !important;
+}
+
+pre code {
+  font-size: 18px !important;
+}
+
+.ml-1 {
+  margin-left: 5px !important;
+}
+
+.mr-1 {
+  margin-right: 5px !important;
+}
+
+.ml-2 {
+  margin-left: 10px !important;
+}
+
+.mr-2 {
+  margin-right: 10px !important;
+}
+
+.page {
+  margin-bottom: 80px;
+}
+
+.inner-dropzone {
+  min-height: 500px;
+  padding: 20px;
+}
+
+.WrapperReadmeView {
+  background: #353542;
+}
