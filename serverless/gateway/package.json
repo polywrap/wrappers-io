@@ -1,0 +1,26 @@
+{
+  "name": "wrappers-io-gateway",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn build:typescript && npx serverless package",
+    "deploy": "npx serverless deploy",
+    "test": "npx serverless invoke local -f home",
+    "test:home": "npx serverless invoke local -f home",
+    "test:status": "yarn build:typescript && npx serverless invoke local -f status",
+    "build:typescript": "yarn build:validateWrapperAndCalcCids && yarn build:apiV0Add && yarn build:status",
+    "build:status": "yarn --cwd ./typescript/functions/status build",
+    "build:apiV0Add": "yarn --cwd ./typescript/functions/apiV0Add build",
+    "build:validateWrapperAndCalcCids": "yarn --cwd ./typescript/functions/validateWrapperAndCalcCids build"
+  },
+  "devDependencies": {
+    "serverless": "3.23.0",
+    "serverless-domain-manager": "6.2.0",
+    "serverless-dynamodb-local": "0.2.40",
+    "serverless-offline": "11.2.1",
+    "serverless-rust": "0.3.8",
+    "serverless-s3-local": "0.6.22",
+    "typescript": "4.8.4"
+  }
+}

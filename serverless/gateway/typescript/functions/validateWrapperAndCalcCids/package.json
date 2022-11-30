@@ -1,0 +1,31 @@
+{
+  "name": "wrappers-io-gateway-validateWrapperAndCalcCids",
+  "version": "0.13.0",
+  "main": "build/index.js",
+  "author": "nerfZael",
+  "license": "MIT",
+  "private": false,
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/polywrap/wrappers-io"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "bundle": "webpack"
+  },
+  "dependencies": {
+    "@polywrap/msgpack-js": "0.10.0-pre.0",
+    "@polywrap/package-validation": "0.10.0-pre.0",
+    "ipfs-core": "0.13.0",
+    "ipfs-repo": "14.0.1",
+    "multiformats": "9.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "16.11.11",
+    "jest": "27.1.1",
+    "ts-jest": "27.0.5",
+    "ts-node": "10.3.0",
+    "typescript": "4.4.2"
+  }
+}
