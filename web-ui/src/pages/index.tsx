@@ -12,6 +12,7 @@ import "core-js/features/array/find";
 import "core-js/features/array/includes";
 import "core-js/features/number/is-nan";
 import Link from "next/link";
+import { formatNumber } from "../utils/formatNumber";
 
 const Home = (): ReactElement<any, any> => {
   const [indexedWrappers, setIndexedWrappers] = useState<any[]>([]);
@@ -105,7 +106,7 @@ const Home = (): ReactElement<any, any> => {
                     </td>
                     <td>{toPrettyHex(wrapper.cid)}</td>
                     <td>
-                      <span>{wrapper.downloadCount}</span>
+                      <span>{formatNumber(wrapper.downloadCount, 2)}</span>
                     </td>
                   </tr>
                 </Link>
