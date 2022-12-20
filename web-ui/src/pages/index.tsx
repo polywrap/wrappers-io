@@ -2,6 +2,7 @@ import PublishWrapperModal from "../components/PublishWrapperModal";
 import Navigation from "../components/Navigation";
 import { WRAPPERS_GATEWAY_URL } from "../constants";
 import { toPrettyHex } from "../utils/toPrettyHex";
+import { formatNumber } from "../utils/formatNumber";
 
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -105,7 +106,7 @@ const Home = (): ReactElement<any, any> => {
                     </td>
                     <td>{toPrettyHex(wrapper.cid)}</td>
                     <td>
-                      <span>{wrapper.downloadCount}</span>
+                      <span>{formatNumber(wrapper.downloadCount, 2)}</span>
                     </td>
                   </tr>
                 </Link>
