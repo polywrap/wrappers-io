@@ -22,7 +22,7 @@ const AllPage = (): ReactElement<any, any> => {
   useEffect(() => {
     axios.get(`${WRAPPERS_GATEWAY_URL}/pins?json=true`).then((result) => {
       const wrappers = result.data.sort(
-        (a, b) => b.downloadCount - a.downloadCount
+        (a: any, b: any) => b.downloadCount - a.downloadCount
       );
 
       setIndexedWrappers(wrappers);
@@ -86,7 +86,7 @@ const AllPage = (): ReactElement<any, any> => {
                         {wrapper.indexes && wrapper.indexes.length > 0 ? (
                           <>
                             {wrapper.indexes
-                              .map((x) => x.name)
+                              .map((x: any) => x.name)
                               .reduce((a: string, b: string) => a + ", " + b)}
                           </>
                         ) : (

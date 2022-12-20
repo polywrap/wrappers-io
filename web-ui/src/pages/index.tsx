@@ -22,7 +22,7 @@ const Home = (): ReactElement<any, any> => {
   useEffect(() => {
     axios.get(`${WRAPPERS_GATEWAY_URL}/pins?json=true`).then((result) => {
       const wrappers = result.data.sort(
-        (a, b) => b.downloadCount - a.downloadCount
+        (a: any, b: any) => b.downloadCount - a.downloadCount
       );
 
       const map: Record<string, any> = {};
@@ -95,7 +95,7 @@ const Home = (): ReactElement<any, any> => {
                         {wrapper.indexes && wrapper.indexes.length > 0 ? (
                           <>
                             {wrapper.indexes
-                              .map((x) => x.name.slice(4, x.name.length))
+                              .map((x: any) => x.name.slice(4, x.name.length))
                               .reduce((a: string, b: string) => a + ", " + b)}
                           </>
                         ) : (
