@@ -2,6 +2,7 @@ import PublishWrapperModal from "../components/PublishWrapperModal";
 import Navigation from "../components/Navigation";
 import { WRAPPERS_GATEWAY_URL } from "../constants";
 import { toPrettyHex } from "../utils/toPrettyHex";
+import { formatNumber } from "../utils/formatNumber";
 
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -12,7 +13,6 @@ import "core-js/features/array/find";
 import "core-js/features/array/includes";
 import "core-js/features/number/is-nan";
 import Link from "next/link";
-import { formatNumber } from "../utils/formatNumber";
 
 const AllPage = (): ReactElement<any, any> => {
   const [indexedWrappers, setIndexedWrappers] = useState<any[]>([]);
