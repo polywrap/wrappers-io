@@ -13,7 +13,7 @@ import "core-js/features/array/includes";
 import "core-js/features/number/is-nan";
 import Link from "next/link";
 
-const Home = (): ReactElement<any, any> => {
+const AllPage = (): ReactElement<any, any> => {
   const [indexedWrappers, setIndexedWrappers] = useState<any[]>([]);
   const [cidToPublish, setCidToPublish] = useState<string | undefined>();
   const [shouldShowPublishModal, setShouldShowPublishModal] = useState(false);
@@ -21,30 +21,9 @@ const Home = (): ReactElement<any, any> => {
 
   useEffect(() => {
     axios.get(`${WRAPPERS_GATEWAY_URL}/pins?json=true`).then((result) => {
-    const wrappers = result.data.sort((a, b) => b.downloadCount - a.downloadCount);
-    
-    let map: Record<string, any> = {};
+      const wrappers = result.data.sort((a, b) => b.downloadCount - a.downloadCount);
 
-      for (const wrapper of wrappers) {
-        for(const index of wrapper.indexes) {
-          if(index.ens) {
-            for(const ensInfo of index.ens) {
-              if (ensInfo.domain) {
-                map[ensInfo.domain] = wrapper;
-              }
-            }
-          }
-        }
-      }
-
-      setIndexedWrappers(
-        Object.keys(map).map(x => ({
-          domain: x,
-          cid: map[x].cid,
-          downloadCount: map[x].downloadCount,
-          indexes: map[x].indexes,
-        }))
-      );
+      setIndexedWrappers(wrappers);
     });
   }, []);
 
@@ -65,14 +44,17 @@ const Home = (): ReactElement<any, any> => {
     <div>
       <Navigation></Navigation>
       <div className="page container-xl">
-        <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">ENS wrappers</h2>
+        <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">All wrappers</h2>
 
         <div className="widget widget-border widget-shadow">
           <table className="table" cellSpacing="3" cellPadding="3">
             <thead>
               <tr>
-                <th>Domain</th>
-                <th>Network</th>
+                <th>Name</th>
+                <th>Manifest Version</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Indexes</th>
                 <th onClick={() => setToggleCidVersion(!toggleCidVersion)}>
                   CID
                 </th>
@@ -84,17 +66,24 @@ const Home = (): ReactElement<any, any> => {
                 <Link key={index} href={`/v/ipfs/${wrapper.cid}`}>
                   <tr key={index}>
                     <td>
-                      <span>{wrapper.domain}</span>
+                      <span>{wrapper.name}</span>
+                    </td>
+                    <td>
+                      <span>{wrapper.version}</span>
+                    </td>
+                    <td>
+                      <span>{wrapper.type}</span>
+                    </td>
+                    <td>
+                      <span>{wrapper.size}</span>
                     </td>
                     <td>
                       <span>
                         {wrapper.indexes && wrapper.indexes.length > 0 ? (
                           <>
-                            {wrapper.indexes
-                              .map(x => x.name.slice(4, x.name.length))
-                              .reduce(
-                                (a: string, b: string) => a + ", " + b
-                              )}
+                            {wrapper.indexes.map(x => x.name).reduce(
+                              (a: string, b: string) => a + ", " + b
+                            )}
                           </>
                         ) : (
                           <>ipfs</>
@@ -111,6 +100,14 @@ const Home = (): ReactElement<any, any> => {
             </tbody>
           </table>
         </div>
+
+        {/* <div className="widget widget-border widget-shadow p-3 widget-small">
+          <div>IPFS node: ipfs.wrappers.io</div>
+          <div>
+            Status: <span className="text-success">online</span>
+          </div>
+        </div> */}
+        {/* <PersistenceGatewayWidget></PersistenceGatewayWidget> */}
         {publishModal}
         <ToastContainer />
       </div>
@@ -118,4 +115,4 @@ const Home = (): ReactElement<any, any> => {
   );
 };
 
-export default Home;
+export default AllPage;

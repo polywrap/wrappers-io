@@ -36,7 +36,12 @@ const Navigation: React.FC = () => {
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <Link href="/">
-                <a className="nav-link">Dashboard</a>
+                <a className="nav-link">ENS</a>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link href="/all">
+                <a className="nav-link">All</a>
               </Link>
             </li>
             <li className="nav-item">
