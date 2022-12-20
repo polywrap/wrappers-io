@@ -21,14 +21,16 @@ const Home = (): ReactElement<any, any> => {
 
   useEffect(() => {
     axios.get(`${WRAPPERS_GATEWAY_URL}/pins?json=true`).then((result) => {
-    const wrappers = result.data.sort((a, b) => b.downloadCount - a.downloadCount);
-    
-    let map: Record<string, any> = {};
+      const wrappers = result.data.sort(
+        (a, b) => b.downloadCount - a.downloadCount
+      );
+
+      const map: Record<string, any> = {};
 
       for (const wrapper of wrappers) {
-        for(const index of wrapper.indexes) {
-          if(index.ens) {
-            for(const ensInfo of index.ens) {
+        for (const index of wrapper.indexes) {
+          if (index.ens) {
+            for (const ensInfo of index.ens) {
               if (ensInfo.domain) {
                 map[ensInfo.domain] = wrapper;
               }
@@ -38,7 +40,7 @@ const Home = (): ReactElement<any, any> => {
       }
 
       setIndexedWrappers(
-        Object.keys(map).map(x => ({
+        Object.keys(map).map((x) => ({
           domain: x,
           cid: map[x].cid,
           downloadCount: map[x].downloadCount,
@@ -65,7 +67,9 @@ const Home = (): ReactElement<any, any> => {
     <div>
       <Navigation></Navigation>
       <div className="page container-xl">
-        <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">ENS wrappers</h2>
+        <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
+          ENS wrappers
+        </h2>
 
         <div className="widget widget-border widget-shadow">
           <table className="table" cellSpacing="3" cellPadding="3">
@@ -91,10 +95,8 @@ const Home = (): ReactElement<any, any> => {
                         {wrapper.indexes && wrapper.indexes.length > 0 ? (
                           <>
                             {wrapper.indexes
-                              .map(x => x.name.slice(4, x.name.length))
-                              .reduce(
-                                (a: string, b: string) => a + ", " + b
-                              )}
+                              .map((x) => x.name.slice(4, x.name.length))
+                              .reduce((a: string, b: string) => a + ", " + b)}
                           </>
                         ) : (
                           <>ipfs</>

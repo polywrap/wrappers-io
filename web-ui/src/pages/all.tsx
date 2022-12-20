@@ -21,7 +21,9 @@ const AllPage = (): ReactElement<any, any> => {
 
   useEffect(() => {
     axios.get(`${WRAPPERS_GATEWAY_URL}/pins?json=true`).then((result) => {
-      const wrappers = result.data.sort((a, b) => b.downloadCount - a.downloadCount);
+      const wrappers = result.data.sort(
+        (a, b) => b.downloadCount - a.downloadCount
+      );
 
       setIndexedWrappers(wrappers);
     });
@@ -44,7 +46,9 @@ const AllPage = (): ReactElement<any, any> => {
     <div>
       <Navigation></Navigation>
       <div className="page container-xl">
-        <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">All wrappers</h2>
+        <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
+          All wrappers
+        </h2>
 
         <div className="widget widget-border widget-shadow">
           <table className="table" cellSpacing="3" cellPadding="3">
@@ -81,9 +85,9 @@ const AllPage = (): ReactElement<any, any> => {
                       <span>
                         {wrapper.indexes && wrapper.indexes.length > 0 ? (
                           <>
-                            {wrapper.indexes.map(x => x.name).reduce(
-                              (a: string, b: string) => a + ", " + b
-                            )}
+                            {wrapper.indexes
+                              .map((x) => x.name)
+                              .reduce((a: string, b: string) => a + ", " + b)}
                           </>
                         ) : (
                           <>ipfs</>
