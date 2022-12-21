@@ -14,10 +14,10 @@ const nextConfig = {
     return {
       '/': { page: '/' },
       '/all': { page: '/all' },
-      '/v/ipfs/:cid': { page: '/v/ipfs/:cid' },
-      '/v/ens/:domain': { page: '/v/ens/:domain' },
-      '/v/ens/:network/:domain': { page: '/v/ens/:network/:domain' },
-      '/v/ocr/:network/:ocrContract/:packageIndex': { page: '/v/ocr/:network/:ocrContract/:packageIndex' },
+      '/v/ipfs/:cid': { page: '/v/ipfs/[cid]' },
+      '/v/ens/:domain': { page: '/v/ens' },
+      '/v/ens/:network/:domain': { page: '/v/ens/[network]/[domain]' },
+      '/v/ocr/:network/:ocrContract/:packageIndex': { page: '/v/ocr/[network]/[ocrContract]/[packageIndex]' },
     }
   }
 };
