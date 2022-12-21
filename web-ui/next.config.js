@@ -9,16 +9,6 @@ const nextConfig = {
     NEXT_ETH_PROVIDER_GOERLI: process.env.NEXT_ETH_PROVIDER_GOERLI,
     NEXT_ETH_PROVIDER_POLYGON: process.env.NEXT_ETH_PROVIDER_POLYGON,
     NEXT_ETH_PROVIDER_LOCALHOST: process.env.NEXT_ETH_PROVIDER_LOCALHOST,
-  },
-  exportPathMap: function() {
-    return {
-      '/': { page: '/' },
-      '/all': { page: '/all' },
-      '/v/ipfs/:cid': { page: '/v/ipfs/[cid]' },
-      '/v/ens/:domain': { page: '/v/ens/[network]' },
-      '/v/ens/:network/:domain': { page: '/v/ens/[network]/[domain]' },
-      '/v/ocr/:network/:ocrContract/:packageIndex': { page: '/v/ocr/[network]/[ocrContract]/[packageIndex]' },
-    }
   }
 };
 
