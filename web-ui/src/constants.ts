@@ -10,6 +10,10 @@ import {
 export const WRAPPERS_GATEWAY_URL =
   process.env.NEXT_WRAPPERS_GATEWAY_URL ?? "https://ipfs.wrappers.io";
 
+export const ENS_DOMAIN_TRACKING_URL =
+  process.env.NEXT_ENS_DOMAIN_TRACKING_URL ??
+  "https://reverse-namehash.wrappers.dev";
+
 export const ETH_PROVIDERS = {
   [Mainnet.chainId]:
     process.env.NEXT_ETH_PROVIDER_MAINNET ??
