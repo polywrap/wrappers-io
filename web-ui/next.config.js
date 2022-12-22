@@ -9,7 +9,7 @@ const nextConfig = {
     NEXT_ETH_PROVIDER_GOERLI: process.env.NEXT_ETH_PROVIDER_GOERLI,
     NEXT_ETH_PROVIDER_POLYGON: process.env.NEXT_ETH_PROVIDER_POLYGON,
     NEXT_ETH_PROVIDER_LOCALHOST: process.env.NEXT_ETH_PROVIDER_LOCALHOST,
-  },
+  }
 };
 
 module.exports = nextConfig;

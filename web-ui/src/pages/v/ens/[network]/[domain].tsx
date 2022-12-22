@@ -6,6 +6,7 @@ import { getFilesByOcrId } from "../../../../utils/ocr/getFilesByOcrId";
 import { getProvider } from "../../../../utils/getProvider";
 import { Network } from "../../../../utils/Network";
 import WrapperPageContent from "../../../../components/WrapperPageContent";
+import { trackEnsDomain } from "../../../../utils/trackEnsDomain";
 
 import { create as createIpfsNode } from "ipfs-http-client";
 import { useEthers } from "@usedapp/core";
@@ -46,6 +47,8 @@ const WrapperPage: NextPage = () => {
         routeChainId,
         networkProvider
       );
+
+      trackEnsDomain(domain);
 
       if (result.cid) {
         const ipfsFiles = await loadFilesFromIpfs(result.cid, ipfsNode);
