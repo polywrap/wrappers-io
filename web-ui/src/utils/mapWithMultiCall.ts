@@ -48,7 +48,7 @@ export const mapWithMultiCall = async <T, TResult>(
 const shouldContinue = async (tasks: Promise<any>[]): Promise<boolean> => {
   const result = await Promise.race([
     Promise.all(tasks),
-    new Promise((resolve) => setTimeout(() => resolve(false), 1000)),
+    new Promise((resolve) => setTimeout(() => resolve(false))),
   ]);
 
   if (result != false) {
