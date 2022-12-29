@@ -2,11 +2,11 @@ import PublishWrapperModal from "../components/PublishWrapperModal";
 import Navigation from "../components/Navigation";
 import { toPrettyHex } from "../utils/toPrettyHex";
 import { formatNumber } from "../utils/formatNumber";
+import { loadAllWrappersFromGateway } from "../utils/loadAllWrappersFromGateway";
 
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Link from "next/link";
-import { loadAllWrappersFromGateway } from "../utils/loadAllWrappersFromGateway";
 
 const AllPage = (): ReactElement<any, any> => {
   const [indexedWrappers, setIndexedWrappers] = useState<any[]>([]);
