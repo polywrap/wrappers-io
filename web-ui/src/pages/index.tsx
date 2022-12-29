@@ -2,12 +2,12 @@ import PublishWrapperModal from "../components/PublishWrapperModal";
 import Navigation from "../components/Navigation";
 import { toPrettyHex } from "../utils/toPrettyHex";
 import { formatNumber } from "../utils/formatNumber";
+import { getWrappersWithEnsOwnerInfo } from "../utils/getWrappersWithEnsOwnerInfo";
 
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Link from "next/link";
 import { useEthers } from "@usedapp/core";
-import { getWrappersWithEnsOwnerInfo } from "../utils/getWrappersWithEnsOwnerInfo";
 
 const Home = (): ReactElement<any, any> => {
   const { library: provider, chainId, account } = useEthers();
@@ -19,12 +19,13 @@ const Home = (): ReactElement<any, any> => {
       return;
     }
 
-    (async function() {
-      const wrappersWithENS = await getWrappersWithEnsOwnerInfo(provider, chainId);
-
-      setWrappers(
-        wrappersWithENS
+    (async function () {
+      const wrappersWithENS = await getWrappersWithEnsOwnerInfo(
+        provider,
+        chainId
       );
+
+      setWrappers(wrappersWithENS);
     })();
   }, [provider, chainId]);
 
@@ -52,11 +53,14 @@ const Home = (): ReactElement<any, any> => {
             </thead>
             <tbody>
               {wrappers.map((wrapper: any, index) => (
-                <Link key={index} href={
-                  wrapper.ens.domain 
-                    ? `/v/ens/${wrapper.network}/${wrapper.ens.domain}`
-                    : `/v/ipfs/${wrapper.cid}`
-                }>
+                <Link
+                  key={index}
+                  href={
+                    wrapper.ens.domain
+                      ? `/v/ens/${wrapper.network}/${wrapper.ens.domain}`
+                      : `/v/ipfs/${wrapper.cid}`
+                  }
+                >
                   <tr key={index}>
                     <td>
                       <span>{wrapper.name}</span>
@@ -65,9 +69,7 @@ const Home = (): ReactElement<any, any> => {
                       <span>{wrapper.ens.domain ?? "Unknown"}</span>
                     </td>
                     <td>
-                      <span>
-                        {wrapper.network}
-                      </span>
+                      <span>{wrapper.network}</span>
                     </td>
                     <td>
                       <span>

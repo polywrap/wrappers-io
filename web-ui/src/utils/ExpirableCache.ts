@@ -1,21 +1,23 @@
 import { StorageManager } from "./StorageManager";
 
 export type CachedItem<T> = {
-  item: T,
-  expiresOn: number,
+  item: T;
+  expiresOn: number;
 };
 
 export class ExpirableCache<TKey extends string | number | symbol, TValue> {
   constructor(
     private readonly storageName: string,
-    private readonly cache: Map<TKey, CachedItem<TValue>>, 
-    private readonly expirationTime: number,
-  ) {
-  }
+    private readonly cache: Map<TKey, CachedItem<TValue>>,
+    private readonly expirationTime: number
+  ) {}
 
-  static load<TKey extends string | number | symbol, TValue>(storageName: string, expirationTime: number): ExpirableCache<TKey, TValue> {
+  static load<TKey extends string | number | symbol, TValue>(
+    storageName: string,
+    expirationTime: number
+  ): ExpirableCache<TKey, TValue> {
     const storage = new StorageManager<Record<string, CachedItem<string>>>(
-      storageName, 
+      storageName,
       () => ({})
     );
     const storedCache: Record<string, CachedItem<string>> = storage.get();
@@ -24,21 +26,20 @@ export class ExpirableCache<TKey extends string | number | symbol, TValue> {
       cache.set(key, storedCache[key]);
     }
 
-    return new ExpirableCache<TKey, TValue>(
-      storageName,
-      cache,
-      expirationTime
-    );
+    return new ExpirableCache<TKey, TValue>(storageName, cache, expirationTime);
   }
 
-  save() {
-    const cache: Record<TKey, CachedItem<TValue>> = {} as Record<TKey, CachedItem<TValue>>;
+  save(): void {
+    const cache: Record<TKey, CachedItem<TValue>> = {} as Record<
+      TKey,
+      CachedItem<TValue>
+    >;
     for (const [key, value] of this.cache) {
       cache[key] = value;
     }
 
     const storage = new StorageManager<Record<TKey, CachedItem<TValue>>>(
-      this.storageName, 
+      this.storageName,
       () => ({} as Record<TKey, CachedItem<TValue>>)
     );
     storage.save(cache);
@@ -58,7 +59,7 @@ export class ExpirableCache<TKey extends string | number | symbol, TValue> {
     return cachedItem.item;
   }
 
-  set(key: TKey, item: TValue) {
+  set(key: TKey, item: TValue): void {
     const cachedItem = this.cache.get(key);
     if (!cachedItem || cachedItem.expiresOn < Date.now()) {
       this.cache.set(key, {
@@ -71,7 +72,7 @@ export class ExpirableCache<TKey extends string | number | symbol, TValue> {
         expiresOn: cachedItem.expiresOn,
       });
     }
-  };
+  }
 
   async getOrUpdate(
     key: TKey,
@@ -81,11 +82,11 @@ export class ExpirableCache<TKey extends string | number | symbol, TValue> {
     if (cachedItem !== null) {
       return cachedItem;
     }
-  
+
     const value = await update();
 
     this.set(key, value);
-  
+
     return value;
   }
 }

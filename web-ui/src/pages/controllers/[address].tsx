@@ -1,12 +1,13 @@
+import { getWrappersWithEnsOwnerInfo } from "../../utils/getWrappersWithEnsOwnerInfo";
+import Navigation from "../../components/Navigation";
+import { formatNumber } from "../../utils/formatNumber";
+import { toPrettyHex } from "../../utils/toPrettyHex";
+
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Link from "next/link";
 import { useEthers } from "@usedapp/core";
 import { useRouter } from "next/router";
-import { getWrappersWithEnsOwnerInfo } from "../../utils/getWrappersWithEnsOwnerInfo";
-import Navigation from "../../components/Navigation";
-import { formatNumber } from "../../utils/formatNumber";
-import { toPrettyHex } from "../../utils/toPrettyHex";
 
 const Home = (): ReactElement<any, any> => {
   const router = useRouter();
@@ -20,13 +21,16 @@ const Home = (): ReactElement<any, any> => {
       return;
     }
 
-    (async function() {
-      const wrappersWithENS = await getWrappersWithEnsOwnerInfo(provider, chainId);
-      const filteredWrappers = wrappersWithENS.filter(wrapper => wrapper.owner === address);
-
-      setWrappers(
-        filteredWrappers
+    (async function () {
+      const wrappersWithENS = await getWrappersWithEnsOwnerInfo(
+        provider,
+        chainId
       );
+      const filteredWrappers = wrappersWithENS.filter(
+        (wrapper) => wrapper.owner === address
+      );
+
+      setWrappers(filteredWrappers);
     })();
   }, [provider, chainId]);
 
@@ -35,7 +39,7 @@ const Home = (): ReactElement<any, any> => {
       <Navigation></Navigation>
       <div className="page container-xl">
         <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
-          Wrappers of {toPrettyHex(address)} 
+          Wrappers of {toPrettyHex(address)}
         </h2>
 
         <div className="widget widget-border widget-shadow">
@@ -46,19 +50,20 @@ const Home = (): ReactElement<any, any> => {
                 <th>Domain</th>
                 <th>Network</th>
                 <th>Controller</th>
-                <th>
-                  CID
-                </th>
+                <th>CID</th>
                 <th>Downloads</th>
               </tr>
             </thead>
             <tbody>
               {wrappers.map((wrapper: any, index) => (
-                <Link key={index} href={
-                  wrapper.ens.domain 
-                    ? `/v/ens/${wrapper.network}/${wrapper.ens.domain}`
-                    : `/v/ipfs/${wrapper.cid}`
-                }>
+                <Link
+                  key={index}
+                  href={
+                    wrapper.ens.domain
+                      ? `/v/ens/${wrapper.network}/${wrapper.ens.domain}`
+                      : `/v/ipfs/${wrapper.cid}`
+                  }
+                >
                   <tr key={index}>
                     <td>
                       <span>{wrapper.name}</span>
@@ -67,9 +72,7 @@ const Home = (): ReactElement<any, any> => {
                       <span>{wrapper.ens.domain ?? "Unknown"}</span>
                     </td>
                     <td>
-                      <span>
-                        {wrapper.network}
-                      </span>
+                      <span>{wrapper.network}</span>
                     </td>
                     <td>
                       <span>

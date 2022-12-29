@@ -1,6 +1,8 @@
 export class StorageManager<T> {
-  constructor(private readonly key: string, private readonly createDefaultItem: () => T) {
-  }
+  constructor(
+    private readonly key: string,
+    private readonly createDefaultItem: () => T
+  ) {}
 
   get(): T {
     const storedItem = localStorage.getItem(this.key);
@@ -12,7 +14,7 @@ export class StorageManager<T> {
     return JSON.parse(storedItem);
   }
 
-  save(item: T) {
+  save(item: T): void {
     localStorage.setItem(this.key, JSON.stringify(item));
-  };
+  }
 }
