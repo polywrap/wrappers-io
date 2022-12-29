@@ -1,18 +1,19 @@
-import PublishWrapperModal from "../components/PublishWrapperModal";
-import Navigation from "../components/Navigation";
-import { toPrettyHex } from "../utils/toPrettyHex";
-import { formatNumber } from "../utils/formatNumber";
-
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Link from "next/link";
 import { useEthers } from "@usedapp/core";
-import { getWrappersWithEnsOwnerInfo } from "../utils/getWrappersWithEnsOwnerInfo";
+import { useRouter } from "next/router";
+import { getWrappersWithEnsOwnerInfo } from "../../utils/getWrappersWithEnsOwnerInfo";
+import Navigation from "../../components/Navigation";
+import { formatNumber } from "../../utils/formatNumber";
+import { toPrettyHex } from "../../utils/toPrettyHex";
 
 const Home = (): ReactElement<any, any> => {
-  const { library: provider, chainId, account } = useEthers();
+  const router = useRouter();
+  const address = router.query.address as string;
+
+  const { library: provider, chainId } = useEthers();
   const [wrappers, setWrappers] = useState<any[]>([]);
-  const [toggleCidVersion, setToggleCidVersion] = useState(false);
 
   useEffect(() => {
     if (!provider || !chainId) {
@@ -21,9 +22,10 @@ const Home = (): ReactElement<any, any> => {
 
     (async function() {
       const wrappersWithENS = await getWrappersWithEnsOwnerInfo(provider, chainId);
+      const filteredWrappers = wrappersWithENS.filter(wrapper => wrapper.owner === address);
 
       setWrappers(
-        wrappersWithENS
+        filteredWrappers
       );
     })();
   }, [provider, chainId]);
@@ -33,7 +35,7 @@ const Home = (): ReactElement<any, any> => {
       <Navigation></Navigation>
       <div className="page container-xl">
         <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
-          ENS Wrappers
+          Wrappers of {toPrettyHex(address)} 
         </h2>
 
         <div className="widget widget-border widget-shadow">
@@ -44,7 +46,7 @@ const Home = (): ReactElement<any, any> => {
                 <th>Domain</th>
                 <th>Network</th>
                 <th>Controller</th>
-                <th onClick={() => setToggleCidVersion(!toggleCidVersion)}>
+                <th>
                   CID
                 </th>
                 <th>Downloads</th>
