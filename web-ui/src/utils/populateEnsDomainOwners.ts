@@ -2,10 +2,10 @@ import { DetailedWrapperEnsModel } from "../models/DetailedWrapperEnsModel";
 import { WrapperEnsModel } from "../models/WrapperEnsModel";
 import { mapWithMultiCall } from "./mapWithMultiCall";
 import { CacheLoader } from "./CacheLoader";
+import { ENS_CONTRACT_ADDRESSES } from "../constants";
 
 import { Provider, Contract } from "ethers-multicall";
 import { ethers } from "ethers";
-import { ENS_CONTRACT_ADDRESSES } from "../constants";
 
 const ENS_REGISTRY_ABI = [
   "function owner(bytes32 node) external view returns (address)",
@@ -52,35 +52,34 @@ export const populateEnsDomainOwners = async (
     wrappersWithOwners,
     mainnetProvider,
     async (wrapper, call) => {
-      const ownerDomain = await reverseLookupCache.getOrUpdate(wrapper.owner, async () => {
-        const reverseLookupDomain = `${wrapper.owner.slice(2)}.addr.reverse`;
+      const ownerDomain = await reverseLookupCache.getOrUpdate(
+        wrapper.owner,
+        async () => {
+          const reverseLookupDomain = `${wrapper.owner.slice(2)}.addr.reverse`;
 
-        const resolverAddress = await call<string>(
-          mainnetRegistry.resolver(
-            ethers.utils.hexlify(
-              ethers.utils.namehash(reverseLookupDomain)
+          const resolverAddress = await call<string>(
+            mainnetRegistry.resolver(
+              ethers.utils.hexlify(ethers.utils.namehash(reverseLookupDomain))
             )
-          )
-        );
+          );
 
-        if (resolverAddress === ethers.constants.AddressZero) {
-          return undefined;
+          if (resolverAddress === ethers.constants.AddressZero) {
+            return undefined;
+          }
+
+          const resolverContract = new Contract(resolverAddress, [
+            "function name(bytes32) external view returns(string)",
+          ]);
+
+          const ownerDomain = await call<string>(
+            resolverContract.name(
+              ethers.utils.hexlify(ethers.utils.namehash(reverseLookupDomain))
+            )
+          );
+
+          return ownerDomain;
         }
-
-        const resolverContract = new Contract(resolverAddress, [
-          "function name(bytes32) external view returns(string)",
-        ]);
-
-        const ownerDomain = await call<string>(
-          resolverContract.name(
-            ethers.utils.hexlify(
-              ethers.utils.namehash(reverseLookupDomain)
-            )
-          )
-        );
-
-        return ownerDomain;
-      });
+      );
 
       return {
         ...wrapper,
