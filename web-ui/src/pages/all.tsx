@@ -1,17 +1,11 @@
 import PublishWrapperModal from "../components/PublishWrapperModal";
 import Navigation from "../components/Navigation";
-import { WRAPPERS_GATEWAY_URL } from "../constants";
 import { toPrettyHex } from "../utils/toPrettyHex";
 import { formatNumber } from "../utils/formatNumber";
+import { loadAllWrappersFromGateway } from "../utils/loadAllWrappersFromGateway";
 
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
-import axios from "axios";
-import "react-app-polyfill/stable";
-import "react-app-polyfill/ie11";
-import "core-js/features/array/find";
-import "core-js/features/array/includes";
-import "core-js/features/number/is-nan";
 import Link from "next/link";
 
 const AllPage = (): ReactElement<any, any> => {
@@ -19,15 +13,19 @@ const AllPage = (): ReactElement<any, any> => {
   const [cidToPublish, setCidToPublish] = useState<string | undefined>();
   const [shouldShowPublishModal, setShouldShowPublishModal] = useState(false);
   const [toggleCidVersion, setToggleCidVersion] = useState(false);
+  const [wrapperCount, setWrapperCount] = useState<number | undefined>();
 
   useEffect(() => {
-    axios.get(`${WRAPPERS_GATEWAY_URL}/pins?json=true`).then((result) => {
-      const wrappers = result.data.sort(
+    (async () => {
+      const wrappers = await loadAllWrappersFromGateway();
+
+      const sortedWrappers = wrappers.sort(
         (a: any, b: any) => b.downloadCount - a.downloadCount
       );
 
-      setIndexedWrappers(wrappers);
-    });
+      setIndexedWrappers(sortedWrappers);
+      setWrapperCount(sortedWrappers.length);
+    })();
   }, []);
 
   const publishModal =
@@ -48,7 +46,7 @@ const AllPage = (): ReactElement<any, any> => {
       <Navigation></Navigation>
       <div className="page container-xl">
         <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
-          All wrappers
+          All Wrappers {wrapperCount ? `(${wrapperCount})` : ""}
         </h2>
 
         <div className="widget widget-border widget-shadow">

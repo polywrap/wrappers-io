@@ -1,18 +1,20 @@
-import PublishWrapperModal from "../components/PublishWrapperModal";
-import Navigation from "../components/Navigation";
-import { toPrettyHex } from "../utils/toPrettyHex";
-import { formatNumber } from "../utils/formatNumber";
-import { getWrappersWithEnsOwnerInfo } from "../utils/getWrappersWithEnsOwnerInfo";
+import { getWrappersWithEnsOwnerInfo } from "../../utils/getWrappersWithEnsOwnerInfo";
+import Navigation from "../../components/Navigation";
+import { formatNumber } from "../../utils/formatNumber";
+import { toPrettyHex } from "../../utils/toPrettyHex";
 
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Link from "next/link";
 import { useEthers } from "@usedapp/core";
+import { useRouter } from "next/router";
 
 const Home = (): ReactElement<any, any> => {
-  const { library: provider, chainId, account } = useEthers();
+  const router = useRouter();
+  const address = router.query.address as string;
+
+  const { library: provider, chainId } = useEthers();
   const [wrappers, setWrappers] = useState<any[]>([]);
-  const [toggleCidVersion, setToggleCidVersion] = useState(false);
   const [wrapperCount, setWrapperCount] = useState<number | undefined>();
 
   useEffect(() => {
@@ -26,14 +28,15 @@ const Home = (): ReactElement<any, any> => {
         chainId
       );
 
-      const sortedWrappers = wrappersWithENS
-        .sort((a: any, b: any) => b.downloadCount - a.downloadCount)
+      const filteredWrappers = wrappersWithENS
+        .filter((wrapper) => wrapper.owner === address)
+        .sort((a: any, b: any) => b.wrapperCount - a.wrapperCount)
         .sort((a: any, b: any) =>
           a.network < b.network ? 1 : a.network > b.network ? -1 : 0
         );
 
-      setWrappers(sortedWrappers);
-      setWrapperCount(sortedWrappers.length);
+      setWrappers(filteredWrappers);
+      setWrapperCount(filteredWrappers.length);
     })();
   }, [provider, chainId]);
 
@@ -42,7 +45,8 @@ const Home = (): ReactElement<any, any> => {
       <Navigation></Navigation>
       <div className="page container-xl">
         <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
-          ENS Wrappers {wrapperCount ? `(${wrapperCount})` : ""}
+          Wrappers of {toPrettyHex(address)}{" "}
+          {wrapperCount ? `(${wrapperCount})` : ""}
         </h2>
 
         <div className="widget widget-border widget-shadow">
@@ -53,9 +57,7 @@ const Home = (): ReactElement<any, any> => {
                 <th>Domain</th>
                 <th>Network</th>
                 <th>Controller</th>
-                <th onClick={() => setToggleCidVersion(!toggleCidVersion)}>
-                  CID
-                </th>
+                <th>CID</th>
                 <th>Downloads</th>
               </tr>
             </thead>

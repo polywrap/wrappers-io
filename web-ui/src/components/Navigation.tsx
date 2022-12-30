@@ -40,6 +40,11 @@ const Navigation: React.FC = () => {
               </Link>
             </li>
             <li className="nav-item">
+              <Link href="/controllers">
+                <a className="nav-link">Controllers</a>
+              </Link>
+            </li>
+            <li className="nav-item">
               <Link href="/all">
                 <a className="nav-link">All</a>
               </Link>
