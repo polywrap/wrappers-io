@@ -5,11 +5,7 @@ import { loadAllWrappersFromGateway } from "./loadAllWrappersFromGateway";
 export const getWrappersFromEns = async (): Promise<WrapperEnsModel[]> => {
   const wrappers = await loadAllWrappersFromGateway();
 
-  const sortedByDownloads: WrapperModel[] = wrappers.sort(
-    (a: any, b: any) => b.downloadCount - a.downloadCount
-  );
-
-  const wrappersFromEns: WrapperEnsModel[] = sortedByDownloads.flatMap(
+  const wrappersFromEns: WrapperEnsModel[] = wrappers.flatMap(
     (wrapper) => {
       return wrapper.indexes
         .filter((index) => index.name.startsWith("ens-"))

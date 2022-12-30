@@ -48,7 +48,7 @@ const ControllersPage = (): ReactElement<any, any> => {
       const sortedControllers = allControllers
         .sort((a: any, b: any) => b.wrapperCount - a.wrapperCount)
         .sort((a: any, b: any) =>
-          a.network > b.network ? 1 : a.network < b.network ? -1 : 0
+          a.network < b.network ? 1 : a.network > b.network ? -1 : 0
         );
 
       setControllers(sortedControllers);

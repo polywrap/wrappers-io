@@ -26,8 +26,14 @@ const Home = (): ReactElement<any, any> => {
         chainId
       );
 
-      setWrappers(wrappersWithENS);
-      setWrapperCount(wrappersWithENS.length);
+      const sortedWrappers = wrappersWithENS.sort(
+        (a: any, b: any) => b.downloadCount - a.downloadCount
+      ).sort((a: any, b: any) =>
+        a.network < b.network ? 1 : a.network > b.network ? -1 : 0
+      );;
+
+      setWrappers(sortedWrappers);
+      setWrapperCount(sortedWrappers.length);
     })();
   }, [provider, chainId]);
 
