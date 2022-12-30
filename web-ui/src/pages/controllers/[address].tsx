@@ -27,9 +27,13 @@ const Home = (): ReactElement<any, any> => {
         provider,
         chainId
       );
-      const filteredWrappers = wrappersWithENS.filter(
-        (wrapper) => wrapper.owner === address
-      );
+
+      const filteredWrappers = wrappersWithENS
+        .filter((wrapper) => wrapper.owner === address)
+        .sort((a: any, b: any) => b.wrapperCount - a.wrapperCount)
+        .sort((a: any, b: any) =>
+          a.network < b.network ? 1 : a.network > b.network ? -1 : 0
+        );
 
       setWrappers(filteredWrappers);
       setWrapperCount(filteredWrappers.length);
