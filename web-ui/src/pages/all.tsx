@@ -13,6 +13,7 @@ const AllPage = (): ReactElement<any, any> => {
   const [cidToPublish, setCidToPublish] = useState<string | undefined>();
   const [shouldShowPublishModal, setShouldShowPublishModal] = useState(false);
   const [toggleCidVersion, setToggleCidVersion] = useState(false);
+  const [wrapperCount, setWrapperCount] = useState<number | undefined>();
 
   useEffect(() => {
     (async () => {
@@ -23,6 +24,7 @@ const AllPage = (): ReactElement<any, any> => {
       );
 
       setIndexedWrappers(sortedWrappers);
+      setWrapperCount(sortedWrappers.length);
     })();
   }, []);
 
@@ -44,7 +46,7 @@ const AllPage = (): ReactElement<any, any> => {
       <Navigation></Navigation>
       <div className="page container-xl">
         <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
-          All Wrappers
+          All Wrappers {wrapperCount ? `(${wrapperCount})` : ""}
         </h2>
 
         <div className="widget widget-border widget-shadow">
