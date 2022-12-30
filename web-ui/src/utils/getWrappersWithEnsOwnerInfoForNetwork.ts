@@ -1,11 +1,9 @@
-import { ENS_CONTRACT_ADDRESSES } from "../constants";
 import { DetailedWrapperEnsModel } from "../models/DetailedWrapperEnsModel";
 import { WrapperEnsModel } from "../models/WrapperEnsModel";
-import { getProvider } from "./getProvider";
 import { populateEnsDomainOwners } from "./populateEnsDomainOwners";
 import { Network } from "./Network";
+import { getMultiCallProviderOrInit } from "./getMultiCallProviderOrInit";
 
-import { Provider, Contract } from "ethers-multicall";
 import { ethers } from "ethers";
 
 export const getWrappersWithEnsOwnerInfoForNetwork = async (
@@ -19,25 +17,22 @@ export const getWrappersWithEnsOwnerInfoForNetwork = async (
     return undefined;
   }
 
-  const multiCallProvider = new Provider(
-    getProvider(desiredChainId, chainId, provider)!
+  const multiCallProvider = await getMultiCallProviderOrInit(
+    desiredChainId,
+    chainId,
+    provider
   );
-
-  await multiCallProvider.init();
-
-  const registry = new Contract(
-    ENS_CONTRACT_ADDRESSES[desiredChainId.toString()].registry,
-    [
-      "function owner(bytes32 node) external view returns (address)",
-      "function resolver(bytes32 node) external view returns (address)",
-      "function setSubnodeOwner(bytes32 node, bytes32 label, address owner) external",
-    ]
+  const mainnetMultiCallProvider = await getMultiCallProviderOrInit(
+    1,
+    chainId,
+    provider
   );
 
   const detailedWrappers = await populateEnsDomainOwners(
     wrappers,
-    registry,
+    chainId,
     multiCallProvider,
+    mainnetMultiCallProvider,
     network
   );
 
