@@ -15,6 +15,7 @@ const Home = (): ReactElement<any, any> => {
 
   const { library: provider, chainId } = useEthers();
   const [wrappers, setWrappers] = useState<any[]>([]);
+  const [wrapperCount, setWrapperCount] = useState<number | undefined>();
 
   useEffect(() => {
     if (!provider || !chainId) {
@@ -31,6 +32,7 @@ const Home = (): ReactElement<any, any> => {
       );
 
       setWrappers(filteredWrappers);
+      setWrapperCount(filteredWrappers.length);
     })();
   }, [provider, chainId]);
 
@@ -39,7 +41,8 @@ const Home = (): ReactElement<any, any> => {
       <Navigation></Navigation>
       <div className="page container-xl">
         <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
-          Wrappers of {toPrettyHex(address)}
+          Wrappers of {toPrettyHex(address)}{" "}
+          {wrapperCount ? `(${wrapperCount})` : ""}
         </h2>
 
         <div className="widget widget-border widget-shadow">

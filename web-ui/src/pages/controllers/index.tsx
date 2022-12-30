@@ -12,6 +12,7 @@ import Link from "next/link";
 const ControllersPage = (): ReactElement<any, any> => {
   const { library: provider, chainId } = useEthers();
   const [controllers, setControllers] = useState<any[]>([]);
+  const [controllerCount, setControllerCount] = useState<number | undefined>();
 
   useEffect(() => {
     if (!provider || !chainId) {
@@ -51,6 +52,7 @@ const ControllersPage = (): ReactElement<any, any> => {
         );
 
       setControllers(sortedControllers);
+      setControllerCount(sortedControllers.length);
     })();
   }, [provider, chainId]);
 
@@ -59,7 +61,7 @@ const ControllersPage = (): ReactElement<any, any> => {
       <Navigation></Navigation>
       <div className="page container-xl">
         <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
-          ENS Controllers
+          ENS Controllers {controllerCount ? `(${controllerCount})` : ""}
         </h2>
 
         <div className="widget widget-border widget-shadow">
