@@ -1,7 +1,7 @@
 import path from "path";
 import * as parser from "lambda-multipart-parser";
 import { InMemoryFile } from "./types";
-import { saveUploadedWrapper, uploadFilesToS3, validateWrapperAndCalcCids } from "./funcs";
+import { saveUploadedWrapper, uploadWrapperToS3, validateWrapperAndCalcCids } from "./funcs";
 import * as AWS from "aws-sdk";
 
 function prefix(words: string[]){
@@ -96,17 +96,9 @@ export const apiV0Add = async (event: any, context: any) => {
 
   const cid = result.cid;
 
-  console.log("WRAPPERS_BUCKET", WRAPPERS_BUCKET);
-  console.log("UPLOADED_WRAPPERS_TABLE", UPLOADED_WRAPPERS_TABLE);
-  await uploadFilesToS3(result.files, cid, s3, WRAPPERS_BUCKET);
+  await uploadWrapperToS3(new Uint8Array(result.wrapperBuffer), cid, s3, WRAPPERS_BUCKET);
 
   await saveUploadedWrapper(cid, dynamoDbClient, UPLOADED_WRAPPERS_TABLE);
-  // const info = this.deps.persistenceStateManager.getTrackedIpfsHashInfo(ipfsHash);
-  // const retryCount = info?.unresponsiveInfo?.retryCount || info?.unresponsiveInfo?.retryCount === 0
-  //   ? info?.unresponsiveInfo?.retryCount + 1
-  //   : 0;
-
-  // await this.deps.persistenceService.pinWrapper(ipfsHash, retryCount, info?.indexes ?? []);
 
   let resp = "";
   for (const file of result.files) {
