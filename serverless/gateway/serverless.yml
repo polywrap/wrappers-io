@@ -37,6 +37,8 @@ package:
   individually: true
 
 custom:
+  serverless-offline:
+    reloadHandler: true
   rust:
     dockerless: true
   customDomain:
@@ -56,11 +58,11 @@ custom:
   globalsTable: 'globals-table-${sls:stage}'
 
 plugins:
-  - serverless-offline
   - serverless-domain-manager
   - serverless-dynamodb-local
   - serverless-s3-local
   - serverless-rust
+  - serverless-offline
 
 functions:
   home:
