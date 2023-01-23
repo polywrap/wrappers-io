@@ -1,34 +1,35 @@
 service: wrappers-io-gateway
 provider:
   name: aws
+  runtime: nodejs16.x
   stage: dev
-  region: us-east-1
-  memorySize: 128
-  timeout: 3
-  apiGateway:
-    binaryMediaTypes:
-      - '*/*'
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource:
-            - Fn::GetAtt: [ UploadedWrappersTable, Arn ]
-        - Effect: "Allow"
-          Action:
-            - "lambda:InvokeFunction"
-          Resource: "*"
-        - Effect: Allow
-          Action:
-            - s3:PutObject
-          Resource: "arn:aws:s3:::wrappers-bucket/*"
+  # region: us-east-1
+  # memorySize: 128
+  # timeout: 3
+  # apiGateway:
+  #   binaryMediaTypes:
+  #     - '*/*'
+  # iam:
+  #   role:
+  #     statements:
+  #       - Effect: Allow
+  #         Action:
+  #           - dynamodb:Query
+  #           - dynamodb:Scan
+  #           - dynamodb:GetItem
+  #           - dynamodb:PutItem
+  #           - dynamodb:UpdateItem
+  #           - dynamodb:DeleteItem
+  #         Resource:
+  #           - Fn::GetAtt: [ UploadedWrappersTable, Arn ]
+  #       - Effect: "Allow"
+  #         Action:
+  #           - "lambda:InvokeFunction"
+  #         Resource: "*"
+  #       - Effect: Allow
+  #         Action:
+  #           - s3:PutObject
+  #         Resource: "arn:aws:s3:::wrappers-bucket/*"
   environment:
     UPLOADED_WRAPPERS_TABLE: ${self:custom.wrappersTable}
     GLOBALS_TABLE: ${self:custom.globalsTable}
@@ -41,27 +42,33 @@ custom:
     reloadHandler: true
   rust:
     dockerless: true
-  customDomain:
-    domainName: gateway.wrappers.dev
-    stage: ${self:provider.stage}
-    certificateName: wrappers.dev
-    createRoute53Record: true
+  # customDomain:
+  #   domainName: gateway.wrappers.dev
+  #   stage: ${self:provider.stage}
+  #   certificateName: wrappers.dev
+  #   createRoute53Record: true
   dynamodb:
-    start:
-      migrate: true
     stages:
       - dev
+    start:
+      port: 8001
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+
   s3:
     host: localhost
-    directory: /tmp
+    port: 8000
+    directory: ./.s3-local
   wrappersTable: 'uploaded-wrappers-table-${sls:stage}'
   globalsTable: 'globals-table-${sls:stage}'
 
 plugins:
   - serverless-domain-manager
+  - serverless-rust
   - serverless-dynamodb-local
   - serverless-s3-local
-  - serverless-rust
   - serverless-offline
 
 functions:

@@ -3,6 +3,8 @@ import * as parser from "lambda-multipart-parser";
 import { InMemoryFile } from "./types";
 import { saveUploadedWrapper, uploadFilesToS3, validateWrapperAndCalcCids } from "./funcs";
 import * as AWS from "aws-sdk";
+import { S3Client } from "@aws-sdk/client-s3";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 function prefix(words: string[]){
   // check border cases size 1 array and empty first word)
@@ -42,12 +44,26 @@ const internalServerError = (message: string) => {
   };
 };
 
-const s3 = new AWS.S3();
+const s3 = new S3Client({
+  forcePathStyle: true,
+    credentials: {
+      accessKeyId: 'S3RVER',
+      secretAccessKey: 'S3RVER',
+    },
+    endpoint: 'http://localhost:8000'
+});
 
 const WRAPPERS_BUCKET = process.env.WRAPPERS_BUCKET
 const UPLOADED_WRAPPERS_TABLE = process.env.UPLOADED_WRAPPERS_TABLE;
 
-const dynamoDbClient = new AWS.DynamoDB.DocumentClient();
+const dynamoDbClient = new DynamoDBClient({
+  region: 'localhost',
+  endpoint: 'http://localhost:8001',
+  credentials: {
+    accessKeyId: 'DEFAULT_ACCESS_KEY',
+    secretAccessKey: 'DEFAULT_SECRET'
+  }
+});
 
 export const apiV0Add = async (event: any, context: any) => {
   if (!WRAPPERS_BUCKET) {
@@ -83,7 +99,8 @@ export const apiV0Add = async (event: any, context: any) => {
   const sanitizedFiles = stripBasePath(filesToAdd);
 
   const result = await validateWrapperAndCalcCids(sanitizedFiles);
- 
+  console.log("RESULT", result);
+
   if(!result.valid) {
     return internalServerError(`Upload is not a valid wrapper. Reason: ${result.failReason}`);
   }
