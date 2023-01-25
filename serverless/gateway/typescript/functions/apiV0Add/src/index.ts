@@ -115,7 +115,7 @@ export const apiV0Add = async (event: any, context: any) => {
 
   console.log("WRAPPERS_BUCKET", WRAPPERS_BUCKET);
   console.log("UPLOADED_WRAPPERS_TABLE", UPLOADED_WRAPPERS_TABLE);
-  await uploadFilesToS3(result.files, cid, s3, WRAPPERS_BUCKET);
+  await uploadFilesToS3(sanitizedFiles, cid, s3, WRAPPERS_BUCKET);
 
   await saveUploadedWrapper(cid, dynamoDbClient, UPLOADED_WRAPPERS_TABLE);
   // const info = this.deps.persistenceStateManager.getTrackedIpfsHashInfo(ipfsHash);
