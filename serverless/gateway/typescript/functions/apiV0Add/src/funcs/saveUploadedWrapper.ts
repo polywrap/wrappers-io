@@ -1,5 +1,3 @@
-import { InMemoryFile } from "../types/InMemoryFile";
-import * as AWS from "aws-sdk";
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 export const saveUploadedWrapper = async (

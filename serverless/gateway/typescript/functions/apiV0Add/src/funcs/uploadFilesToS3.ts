@@ -3,6 +3,7 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 import { pack } from "tar-stream";
 import { gzip } from "node-gzip";
+import { Readable } from "stream";
 
 export const uploadFilesToS3 = async (
   files: InMemoryFile[],
@@ -14,6 +15,7 @@ export const uploadFilesToS3 = async (
 
   // Tarball
   const tarBall = pack();
+
   for (const file of files) {
     if (file.content?.length) {
       tarBall.entry({ name: file.path }, Buffer.from(file.content));
@@ -22,6 +24,24 @@ export const uploadFilesToS3 = async (
 
   tarBall.finalize();
 
+  const buffer = await getBufferFromReadableStream(tarBall);
+
+  // GZip
+  const gzipped = await gzip(buffer);
+
+  // Upload gzipped
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: wrappersBucket,
+      Key: `${ipfsHash}.tar.gz`,
+      Body: gzipped,
+    })
+  );
+  
+  console.log("uploaded files to s3");
+};
+
+async function getBufferFromReadableStream(tarBall: Readable): Promise<Buffer> {
   const buffers: Uint8Array[] = [];
 
   for await (const data of tarBall) {
@@ -30,27 +50,5 @@ export const uploadFilesToS3 = async (
 
   const finalBuffer = Buffer.concat(buffers);
 
-  // GZip
-  const gzipped = await gzip(finalBuffer);
-
-  // Upload gzipped
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: wrappersBucket,
-      Key: `${ipfsHash}.tar.gz`,
-      Body: gzipped
-    })
-  );
-
-  // Upload regular
-  for (const file of files) {
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: wrappersBucket,
-        Key: `${ipfsHash}/${file.path}`,
-        Body: file.content,
-      })
-    );
-  }
-  console.log("uploaded files to s3");
-};
+  return finalBuffer;
+}

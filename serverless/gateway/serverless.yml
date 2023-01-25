@@ -3,33 +3,33 @@ provider:
   name: aws
   runtime: nodejs16.x
   stage: dev
-  # region: us-east-1
-  # memorySize: 128
-  # timeout: 3
-  # apiGateway:
-  #   binaryMediaTypes:
-  #     - '*/*'
-  # iam:
-  #   role:
-  #     statements:
-  #       - Effect: Allow
-  #         Action:
-  #           - dynamodb:Query
-  #           - dynamodb:Scan
-  #           - dynamodb:GetItem
-  #           - dynamodb:PutItem
-  #           - dynamodb:UpdateItem
-  #           - dynamodb:DeleteItem
-  #         Resource:
-  #           - Fn::GetAtt: [ UploadedWrappersTable, Arn ]
-  #       - Effect: "Allow"
-  #         Action:
-  #           - "lambda:InvokeFunction"
-  #         Resource: "*"
-  #       - Effect: Allow
-  #         Action:
-  #           - s3:PutObject
-  #         Resource: "arn:aws:s3:::wrappers-bucket/*"
+  region: us-east-1
+  memorySize: 128
+  timeout: 3
+  apiGateway:
+    binaryMediaTypes:
+      - '*/*'
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ UploadedWrappersTable, Arn ]
+        - Effect: "Allow"
+          Action:
+            - "lambda:InvokeFunction"
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+          Resource: "arn:aws:s3:::wrappers-bucket/*"
   environment:
     UPLOADED_WRAPPERS_TABLE: ${self:custom.wrappersTable}
     GLOBALS_TABLE: ${self:custom.globalsTable}
@@ -42,11 +42,11 @@ custom:
     reloadHandler: true
   rust:
     dockerless: true
-  # customDomain:
-  #   domainName: gateway.wrappers.dev
-  #   stage: ${self:provider.stage}
-  #   certificateName: wrappers.dev
-  #   createRoute53Record: true
+  customDomain:
+    domainName: gateway.wrappers.dev
+    stage: ${self:provider.stage}
+    certificateName: wrappers.dev
+    createRoute53Record: true
   dynamodb:
     stages:
       - dev
@@ -56,7 +56,6 @@ custom:
       heapInitial: 200m
       heapMax: 1g
       migrate: true
-
   s3:
     host: localhost
     port: 8000
