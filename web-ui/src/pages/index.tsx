@@ -1,19 +1,23 @@
-import PublishWrapperModal from "../components/PublishWrapperModal";
 import Navigation from "../components/Navigation";
 import { toPrettyHex } from "../utils/toPrettyHex";
 import { formatNumber } from "../utils/formatNumber";
-import { getWrappersWithEnsOwnerInfo } from "../utils/getWrappersWithEnsOwnerInfo";
 
 import { ReactElement, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Link from "next/link";
 import { useEthers } from "@usedapp/core";
+import { getEnsDomains } from "../utils/getEnsDomains";
+import { Network } from "../utils/Network";
+import { WrapperEnsModel } from "../models/WrapperEnsModel";
 
 const Home = (): ReactElement<any, any> => {
   const { library: provider, chainId, account } = useEthers();
-  const [wrappers, setWrappers] = useState<any[]>([]);
+  const [domains, setDomains] = useState<any[]>([]);
   const [toggleCidVersion, setToggleCidVersion] = useState(false);
   const [wrapperCount, setWrapperCount] = useState<number | undefined>();
+  const [network, setNetwork] = useState<string>();
+  const [wrappers, setWrappers] = useState<WrapperEnsModel[] | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState<boolean | undefined>();
 
   useEffect(() => {
     if (!provider || !chainId) {
@@ -21,19 +25,20 @@ const Home = (): ReactElement<any, any> => {
     }
 
     (async function () {
-      const wrappersWithENS = await getWrappersWithEnsOwnerInfo(
+      setIsLoading(true);
+
+      const [ensDomains, wrappers] = await getEnsDomains(
         provider,
-        chainId
+        chainId,
+        Network.fromChainId(chainId).name
       );
 
-      const sortedWrappers = wrappersWithENS
-        .sort((a: any, b: any) => b.downloadCount - a.downloadCount)
-        .sort((a: any, b: any) =>
-          a.network < b.network ? 1 : a.network > b.network ? -1 : 0
-        );
+      setWrappers(wrappers);
 
-      setWrappers(sortedWrappers);
-      setWrapperCount(sortedWrappers.length);
+      setNetwork(Network.fromChainId(chainId).label);
+      setDomains(ensDomains);
+      setWrapperCount(ensDomains.length);
+      setIsLoading(false);
     })();
   }, [provider, chainId]);
 
@@ -42,58 +47,54 @@ const Home = (): ReactElement<any, any> => {
       <Navigation></Navigation>
       <div className="page container-xl">
         <h2 className="pt-3 pl-3 pr-3 pb-2 mt-2 mb-4 text-center">
-          ENS Wrappers {wrapperCount ? `(${wrapperCount})` : ""}
+          {
+            isLoading
+            ? <>Loading...</>
+            : <>
+              {
+                network
+                ? <>ENS on {network} {wrapperCount ? `(${wrapperCount})` : ""}</>
+                : <>Connect your wallet to view wrappers</>
+              }
+              </>
+          }
+
         </h2>
 
-        <div className="widget widget-border widget-shadow">
-          <table className="table" cellSpacing="3" cellPadding="3">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Domain</th>
-                <th>Network</th>
-                <th>Controller</th>
-                <th onClick={() => setToggleCidVersion(!toggleCidVersion)}>
-                  CID
-                </th>
-                <th>Downloads</th>
-              </tr>
-            </thead>
-            <tbody>
-              {wrappers.map((wrapper: any, index) => (
-                <Link
-                  key={index}
-                  href={
-                    wrapper.ens.domain
-                      ? `/v/ens/${wrapper.network}/${wrapper.ens.domain}`
-                      : `/v/ipfs/${wrapper.cid}`
-                  }
-                >
-                  <tr key={index}>
-                    <td>
-                      <span>{wrapper.name}</span>
-                    </td>
-                    <td>
-                      <span>{wrapper.ens.domain ?? "Unknown"}</span>
-                    </td>
-                    <td>
-                      <span>{wrapper.network}</span>
-                    </td>
-                    <td>
-                      <span>
-                        {wrapper.ownerDomain ?? toPrettyHex(wrapper.owner)}
-                      </span>
-                    </td>
-                    <td>{toPrettyHex(wrapper.cid)}</td>
-                    <td>
-                      <span>{formatNumber(wrapper.downloadCount, 2)}</span>
-                    </td>
-                  </tr>
-                </Link>
+        {domains.map((ensDomain: any, index) => (
+          <div className="widget widget-border widget-shadow spacing padding">
+            <div key={index}>
+              <div>
+                Domain: {ensDomain.domain ?? "Unknown"} 
+              </div> 
+              <div>
+                Owner: {ensDomain.ownerDomain ?? toPrettyHex(ensDomain.owner)}
+              </div>
+              {
+                wrappers?.find(x => x.ens.node === ensDomain.node) 
+                ? <>
+                <span>CID: &nbsp;
+                  
+                  <Link
+                    key={index}
+                    href={`/v/ipfs/${wrappers?.find(x => x.ens.node === ensDomain.node)?.cid}`}
+                  >
+                    {wrappers?.find(x => x.ens.node === ensDomain.node)?.cid}
+                  </Link>
+                </span>
+                </>
+                : <></>
+              }
+              <div>
+              {ensDomain.textRecords.map(x => (
+                <div>
+                  {x.key.slice(5)}: {x.value}
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+              </div>
+            </div>
+          </div>
+        ))}
         <ToastContainer />
       </div>
     </div>

@@ -20,7 +20,7 @@
     }
 
     tbody {
-      tr {
+      tr.clickable {
         cursor: pointer;
         &:hover {
           background-color: #7d9e3063;

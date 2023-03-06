@@ -9,6 +9,13 @@ export class CacheLoader {
     );
   }
 
+  static ensWrappersForNetwork(network: string): ExpirableCache<string, DomainModel[] | undefined> {
+    return ExpirableCache.load<string, DomainModel[] | undefined>(
+      `ens-wrappers-for-network-${network}`,
+      1000 * 30
+    );
+  }
+
   static ensReverseLookup(
     network: string
   ): ExpirableCache<string, string | undefined> {

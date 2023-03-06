@@ -1,17 +1,17 @@
-import { DetailedWrapperEnsModel } from "../models/DetailedWrapperEnsModel";
-import { WrapperEnsModel } from "../models/WrapperEnsModel";
-import { populateWrapperEnsDomainOwners } from "./populateWrapperEnsDomainOwners";
 import { Network } from "./Network";
 import { getMultiCallProviderOrInit } from "./getMultiCallProviderOrInit";
 
 import { ethers } from "ethers";
+import { DetailedDomainModel } from "../models/DetailedDomainModel";
+import { DomainModel } from "../models/DomainModel";
+import { populateEnsDomainOwners } from "./populateEnsDomainOwners";
 
-export const getWrappersWithEnsOwnerInfoForNetwork = async (
-  wrappers: WrapperEnsModel[],
+export const getDomainsWithEnsOwnerInfoForNetwork = async (
+  domains: DomainModel[],
   network: string,
   chainId: number,
   provider: ethers.providers.Provider
-): Promise<DetailedWrapperEnsModel[] | undefined> => {
+): Promise<DetailedDomainModel[] | undefined> => {
   const desiredChainId = Network.fromNetworkName(network).chainId;
   if (!desiredChainId) {
     return undefined;
@@ -28,13 +28,13 @@ export const getWrappersWithEnsOwnerInfoForNetwork = async (
     provider
   );
 
-  const detailedWrappers = await populateWrapperEnsDomainOwners(
-    wrappers,
+  const detailedDomains = await populateEnsDomainOwners(
+    domains,
     chainId,
     multiCallProvider,
     mainnetMultiCallProvider,
     network
   );
 
-  return detailedWrappers;
+  return detailedDomains;
 };

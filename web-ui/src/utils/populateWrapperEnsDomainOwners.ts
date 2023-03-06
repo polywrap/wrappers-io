@@ -1,11 +1,11 @@
+import { DetailedWrapperEnsModel } from "../models/DetailedWrapperEnsModel";
+import { WrapperEnsModel } from "../models/WrapperEnsModel";
 import { mapWithMultiCall } from "./mapWithMultiCall";
 import { CacheLoader } from "./CacheLoader";
 import { ENS_CONTRACT_ADDRESSES } from "../constants";
 
 import { Provider, Contract } from "ethers-multicall";
 import { ethers } from "ethers";
-import { DomainModel } from "../models/DomainModel";
-import { DetailedDomainModel } from "../models/DetailedDomainModel";
 
 const ENS_REGISTRY_ABI = [
   "function owner(bytes32 node) external view returns (address)",
@@ -13,13 +13,13 @@ const ENS_REGISTRY_ABI = [
   "function setSubnodeOwner(bytes32 node, bytes32 label, address owner) external",
 ];
 
-export const populateEnsDomainOwners = async (
-  domains: DomainModel[],
+export const populateWrapperEnsDomainOwners = async (
+  wrappers: WrapperEnsModel[],
   chainId: number,
   provider: Provider,
   mainnetProvider: Provider,
   network: string
-): Promise<DetailedDomainModel[]> => {
+): Promise<DetailedWrapperEnsModel[]> => {
   const domainOwnersCache = CacheLoader.ensDomainOwners(network);
   const reverseLookupCache = CacheLoader.ensReverseLookup(network);
 
@@ -28,16 +28,16 @@ export const populateEnsDomainOwners = async (
     ENS_REGISTRY_ABI
   );
 
-  const domainsWithOwners: DetailedDomainModel[] = await mapWithMultiCall(
-    domains,
+  const wrappersWithOwners: DetailedWrapperEnsModel[] = await mapWithMultiCall(
+    wrappers,
     provider,
-    async (domain, call) => {
-      const owner = (await domainOwnersCache.getOrUpdate(domain.node, () =>
-        call<string>(registry.owner(ethers.utils.hexlify(domain.node)))
+    async (wrapper, call) => {
+      const owner = (await domainOwnersCache.getOrUpdate(wrapper.ens.node, () =>
+        call<string>(registry.owner(ethers.utils.hexlify(wrapper.ens.node)))
       )) as string;
 
       return {
-        ...domain,
+        ...wrapper,
         owner,
       };
     }
@@ -48,14 +48,14 @@ export const populateEnsDomainOwners = async (
     ENS_REGISTRY_ABI
   );
 
-  const detailedDomains: DetailedDomainModel[] = await mapWithMultiCall(
-    domainsWithOwners,
+  const detailedWrappers: DetailedWrapperEnsModel[] = await mapWithMultiCall(
+    wrappersWithOwners,
     mainnetProvider,
-    async (domain, call) => {
+    async (wrapper, call) => {
       const ownerDomain = await reverseLookupCache.getOrUpdate(
-        domain.owner,
+        wrapper.owner,
         async () => {
-          const reverseLookupDomain = `${domain.owner.slice(2)}.addr.reverse`;
+          const reverseLookupDomain = `${wrapper.owner.slice(2)}.addr.reverse`;
 
           const resolverAddress = await call<string>(
             mainnetRegistry.resolver(
@@ -82,7 +82,7 @@ export const populateEnsDomainOwners = async (
       );
 
       return {
-        ...domain,
+        ...wrapper,
         ownerDomain: ownerDomain as string | undefined,
       };
     }
@@ -91,5 +91,5 @@ export const populateEnsDomainOwners = async (
   domainOwnersCache.save();
   reverseLookupCache.save();
 
-  return detailedDomains;
+  return detailedWrappers;
 };
