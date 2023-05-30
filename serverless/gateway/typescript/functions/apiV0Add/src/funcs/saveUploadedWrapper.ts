@@ -1,9 +1,8 @@
-import { InMemoryFile } from "../types/InMemoryFile";
-import * as AWS from "aws-sdk";
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 export const saveUploadedWrapper = async (
   cid: string,
-  dynamoDbClient: AWS.DynamoDB.DocumentClient,
+  dynamoDbClient: DynamoDBClient,
   wrappersTable: string
 ): Promise<void> => {
   const params = {
@@ -14,6 +13,13 @@ export const saveUploadedWrapper = async (
   };
 
   console.log("saveUploadedWrapper");
-  await dynamoDbClient.put(params).promise();
+  await dynamoDbClient.send(
+    new PutItemCommand({
+      TableName: wrappersTable,
+      Item: {
+        cid: { S: cid },
+      },
+    })
+  );
   console.log("saved");
 };
