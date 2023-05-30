@@ -1,34 +1,24 @@
-import { IDb } from "./IDb";
+import { AccountService } from "./AccountService";
 import { Status } from "./Status";
-import { Version } from "./Version";
-import { getLatest, sortVersions } from "./semver";
+import { UploadsService } from "./UploadsService";
 
 export class InternalServer {
-  constructor(private readonly uploadsDb: IDb) {}
+  constructor(private readonly uploadsService: UploadsService, private readonly accountService: AccountService) {}
 
   async publish(
     user: string,
     packageName: string,
     uri: string,
-    version?: string
+    apiKey?: string,
+    version?: string,
   ): Promise<any> {
-    const requiredVersion = version
-      ? version as string
-      : "latest";
+    const isVerified = await this.accountService.verify(user, apiKey);
 
-    const key = `${user}/${packageName}`;
-
-    let versions = await this.uploadsDb.read<Version[]>("name", key);
-
-    if (!versions) {
-      versions = [];
+    if (!isVerified) {
+      return Status.NotFound();
     }
 
-    versions.push({ name: requiredVersion, uri: uri as string });
-
-    await this.uploadsDb.save("name", key, versions);
-
-    return Status.Ok({ message: "Published." });
+    return this.uploadsService.publish(user, packageName, uri, version);
   }
 
   async resolve(
@@ -36,24 +26,6 @@ export class InternalServer {
     packageName: string,
     version?: string
   ): Promise<any> {
-    const key = `${user}/${packageName}`;
-
-    let versions = await this.uploadsDb.read<Version[]>("name", key) ?? [];
-
-    let uri = undefined;
-
-    if (version && versions) {
-      uri = getLatest(version, versions)?.uri;
-    } else if (versions && versions.length > 0) {
-      const sorted = sortVersions(versions);
-      uri = sorted[sorted.length - 1].uri;
-    }
-
-    if (!uri) {
-      return {
-        statusCode: 404,
-      };
-    }
-    return Status.Ok({ uri });
+    return this.uploadsService.resolve(user, packageName, version);
   }
 }

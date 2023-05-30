@@ -6,9 +6,6 @@ provider:
   region: us-east-1
   memorySize: 128
   timeout: 3
-  apiGateway:
-    binaryMediaTypes:
-      - '*/*'
   iam:
     role:
       statements:
@@ -26,6 +23,8 @@ provider:
           Resource: "*"
   environment:
     UPLOADS_TABLE: ${self:custom.uploadsTable}
+    WRAPPERS_GATEWAY_ADMIN_KEY: ${self:custom.wrappersGatewayAdminKey.wrappers_gateway_admin_key}
+    ACCOUNT_SERVICE_URI: https://accounts.wrappers.dev
 
 package: 
   individually: true
@@ -50,12 +49,11 @@ custom:
       heapMax: 1g
       migrate: true
   uploadsTable: 'uploads-table-${sls:stage}'
+  wrappersGatewayAdminKey: ${ssm:/aws/reference/secretsmanager/wrappers-gateway-admin-key}
 
 plugins:
   - serverless-domain-manager
-  - serverless-rust
   - serverless-dynamodb-local
-  - serverless-s3-local
   - serverless-offline
 
 functions:

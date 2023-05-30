@@ -1,15 +1,16 @@
 import { InMemoryDb } from "../src/InMemoryDb";
 import { InternalServer } from "../src/InternalServer";
+import { UploadsService } from "../src/UploadsService";
 import { Version } from "../src/Version";
 
 describe('Server', () => {
   let dbMock: InMemoryDb;
-  let server: InternalServer;
+  let service: UploadsService;
   ;
 
   beforeEach(() => {
     dbMock = new InMemoryDb();
-    server = new InternalServer(dbMock);
+    service = new UploadsService(dbMock);
   });
 
   describe('_publish', () => {
@@ -19,7 +20,7 @@ describe('Server', () => {
       const uri = 'uri';
       const version = '1.0.0';
 
-      await server.publish(user, packageName, uri, version);
+      await service.publish(user, packageName, uri, version);
 
       const savedVersions = await dbMock.read<Version[]>('name', `${user}/${packageName}`);
       expect(savedVersions).toEqual([{ name: version, uri }]);
@@ -33,8 +34,8 @@ describe('Server', () => {
       const version1 = '1.0.0';
       const version2 = '2.0.0';
 
-      await server.publish(user, packageName, uri1, version1);
-      await server.publish(user, packageName, uri2, version2);
+      await service.publish(user, packageName, uri1, version1);
+      await service.publish(user, packageName, uri2, version2);
 
       const savedVersions = await dbMock.read<Version[]>('name', `${user}/${packageName}`);
       expect(savedVersions).toEqual([{ name: version1, uri: uri1 }, { name: version2, uri: uri2 }]);
@@ -51,7 +52,7 @@ describe('Server', () => {
       // first publish versions
       await dbMock.save('name', `${user}/${packageName}`, [version1, version2]);
 
-      const result = await server.resolve(user, packageName);
+      const result = await service.resolve(user, packageName);
 
       expect(result).toEqual({ statusCode: 200, body: { uri: version2.uri } });
     });
@@ -65,7 +66,7 @@ describe('Server', () => {
       // first publish versions
       await dbMock.save('name', `${user}/${packageName}`, [version1, version2]);
 
-      const result = await server.resolve(user, packageName, version1.name);
+      const result = await service.resolve(user, packageName, version1.name);
 
       expect(result).toEqual({ statusCode: 200, body: { uri: version1.uri } });
     });
@@ -74,7 +75,7 @@ describe('Server', () => {
       const user = 'user';
       const packageName = 'non_existent_package';
 
-      const result = await server.resolve(user, packageName);
+      const result = await service.resolve(user, packageName);
 
       expect(result).toEqual({ statusCode: 404 });
     });
