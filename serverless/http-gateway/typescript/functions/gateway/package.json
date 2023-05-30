@@ -16,11 +16,7 @@
     "test": "jest --passWithNoTests --runInBand --detectOpenHandles --verbose"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.254.0",
-    "aws-sdk": "2.1248.0",
-    "lambda-multipart-parser": "1.0.1",
-    "node-gzip": "^1.1.2",
-    "tar-stream": "^3.0.0"
+    "@aws-sdk/client-dynamodb": "3.254.0"
   },
   "devDependencies": {
     "@types/node": "16.11.11",
