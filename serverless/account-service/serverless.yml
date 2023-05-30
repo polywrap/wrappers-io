@@ -1,0 +1,152 @@
+service: wrappers-account-service
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: dev
+  region: us-east-1
+  memorySize: 128
+  timeout: 3
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ AccountsTable, Arn ]
+        - Effect: "Allow"
+          Action:
+            - "lambda:InvokeFunction"
+          Resource: "*"
+  environment:
+    ACCOUNTS_TABLE: ${self:custom.accountsTable}
+    WRAPPERS_GATEWAY_ADMIN_KEY: ${self:custom.wrappersGatewayAdminKey.wrappers_gateway_admin_key}
+
+package: 
+  individually: true
+
+custom:
+  serverless-offline:
+    reloadHandler: true
+  rust:
+    dockerless: true
+  customDomain:
+    domainName: accounts.wrappers.dev
+    stage: ${self:provider.stage}
+    certificateName: wrappers.dev
+    createRoute53Record: true
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8001
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+  accountsTable: 'accounts-table-${sls:stage}'
+  wrappersGatewayAdminKey: ${ssm:/aws/reference/secretsmanager/wrappers-gateway-admin-key}
+
+plugins:
+  - serverless-domain-manager
+  - serverless-dynamodb-local
+  - serverless-s3-local
+  - serverless-offline
+
+functions:
+  verify:
+    handler: ./typescript/functions/gateway/build/index.server.verify
+    runtime: nodejs16.x
+    memorySize: 256
+    timeout: 10
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./typescript/functions/gateway/build/**
+        - ./typescript/functions/gateway/node_modules/**
+    events:
+      - http:
+          path: u/{user}/verify/{key}/{adminKey}
+          method: get
+          cors: true
+  create:
+    handler: ./typescript/functions/gateway/build/index.server.create
+    runtime: nodejs16.x
+    memorySize: 256
+    timeout: 10
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./typescript/functions/gateway/build/**
+        - ./typescript/functions/gateway/node_modules/**
+    events:
+      - http:
+          path: u/{user}/{adminKey}
+          method: post
+          cors: true
+  delete:
+    handler: ./typescript/functions/gateway/build/index.server.delete
+    runtime: nodejs16.x
+    memorySize: 256
+    timeout: 10
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./typescript/functions/gateway/build/**
+        - ./typescript/functions/gateway/node_modules/**
+    events:
+      - http:
+          path: u/{user}/{adminKey}
+          method: delete
+          cors: true
+  restore:
+    handler: ./typescript/functions/gateway/build/index.server.restore
+    runtime: nodejs16.x
+    memorySize: 256
+    timeout: 10
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./typescript/functions/gateway/build/**
+        - ./typescript/functions/gateway/node_modules/**
+    events:
+      - http:
+          path: u/{user}/restore/{adminKey}
+          method: post
+          cors: true
+  get:
+    handler: ./typescript/functions/gateway/build/index.server.get
+    runtime: nodejs16.x
+    memorySize: 256
+    timeout: 10
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./typescript/functions/gateway/build/**
+        - ./typescript/functions/gateway/node_modules/**
+    events:
+      - http:
+          path: u/{user}/info/{adminKey}
+          method: get
+          cors: true
+resources:
+  Resources:
+    AccountsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.accountsTable}
