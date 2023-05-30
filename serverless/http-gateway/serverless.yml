@@ -1,0 +1,106 @@
+service: wrappers-http-gateway
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: dev
+  region: us-east-1
+  memorySize: 128
+  timeout: 3
+  apiGateway:
+    binaryMediaTypes:
+      - '*/*'
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ UploadsTable, Arn ]
+        - Effect: "Allow"
+          Action:
+            - "lambda:InvokeFunction"
+          Resource: "*"
+  environment:
+    UPLOADS_TABLE: ${self:custom.uploadsTable}
+
+package: 
+  individually: true
+
+custom:
+  serverless-offline:
+    reloadHandler: true
+  rust:
+    dockerless: true
+  customDomain:
+    domainName: http.wrappers.dev
+    stage: ${self:provider.stage}
+    certificateName: wrappers.dev
+    createRoute53Record: true
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8001
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+  uploadsTable: 'uploads-table-${sls:stage}'
+
+plugins:
+  - serverless-domain-manager
+  - serverless-rust
+  - serverless-dynamodb-local
+  - serverless-s3-local
+  - serverless-offline
+
+functions:
+  publish:
+    handler: ./typescript/functions/gateway/build/index.server.publish
+    runtime: nodejs16.x
+    memorySize: 256
+    timeout: 10
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./typescript/functions/gateway/build/**
+        - ./typescript/functions/gateway/node_modules/**
+    events:
+      - http:
+          path: u/{user}/{package}
+          method: post
+          cors: true
+  resolve:
+    handler: ./typescript/functions/gateway/build/index.server.resolve
+    runtime: nodejs16.x
+    memorySize: 256
+    timeout: 10
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./typescript/functions/gateway/build/**
+        - ./typescript/functions/gateway/node_modules/**
+    events:
+      - http:
+          path: u/{user}/{package}
+          method: get
+          cors: true
+resources:
+  Resources:
+    UploadsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.uploadsTable}

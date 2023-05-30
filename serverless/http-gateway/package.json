@@ -1,0 +1,25 @@
+{
+  "name": "wrappers-http-gateway",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn build:typescript && npx serverless package",
+    "deploy": "npx serverless deploy",
+    "test": "npx serverless invoke local -f home",
+    "build:typescript": "yarn build:gateway",
+    "build:gateway": "yarn --cwd ./typescript/functions/gateway build",
+    "install:typescript": "yarn install:gateway",
+    "install:gateway": "yarn --cwd ./typescript/functions/gateway",
+    "dev": "yarn build:typescript && yarn serverless offline start"
+  },
+  "devDependencies": {
+    "serverless": "3.23.0",
+    "serverless-domain-manager": "6.2.0",
+    "serverless-dynamodb-local": "0.2.40",
+    "serverless-offline": "11.2.1",
+    "serverless-rust": "0.3.8",
+    "serverless-s3-local": "0.6.22",
+    "typescript": "4.8.4"
+  }
+}
