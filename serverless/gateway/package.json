@@ -12,7 +12,12 @@
     "build:typescript": "yarn build:validateWrapperAndCalcCids && yarn build:apiV0Add && yarn build:status",
     "build:status": "yarn --cwd ./typescript/functions/status build",
     "build:apiV0Add": "yarn --cwd ./typescript/functions/apiV0Add build",
-    "build:validateWrapperAndCalcCids": "yarn --cwd ./typescript/functions/validateWrapperAndCalcCids build"
+    "build:validateWrapperAndCalcCids": "yarn --cwd ./typescript/functions/validateWrapperAndCalcCids build",
+    "install:typescript": "yarn install:validateWrapperAndCalcCids && yarn install:apiV0Add && yarn install:status",
+    "install:status": "yarn --cwd ./typescript/functions/status",
+    "install:apiV0Add": "yarn --cwd ./typescript/functions/apiV0Add",
+    "install:validateWrapperAndCalcCids": "yarn --cwd ./typescript/functions/validateWrapperAndCalcCids",
+    "dev": "yarn serverless offline"
   },
   "devDependencies": {
     "serverless": "3.23.0",
