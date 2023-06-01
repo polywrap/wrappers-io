@@ -86,7 +86,7 @@ functions:
         - ./typescript/functions/gateway/node_modules/**
     events:
       - http:
-          path: u/{user}/{package}
+          path: u/{user}/{package}/{filePath}
           method: get
           cors: true
 resources:
