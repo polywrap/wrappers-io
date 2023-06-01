@@ -22,8 +22,6 @@
   "devDependencies": {
     "@types/jest": "26.0.8",
     "@types/node": "16.11.11",
-    "@types/node-gzip": "^1.1.0",
-    "@types/tar-stream": "^2.2.2",
     "jest": "27.1.1",
     "ts-jest": "27.0.5",
     "ts-node": "10.3.0",
