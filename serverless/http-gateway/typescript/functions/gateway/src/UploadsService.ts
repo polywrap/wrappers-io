@@ -28,7 +28,7 @@ export class UploadsService {
 
     await this.uploadsDb.save("name", key, versions);
 
-    return Status.Ok({ message: "Published." });
+    return Status.Ok({ message: `Published: ${uri}` });
   }
 
   async resolve(
@@ -54,6 +54,9 @@ export class UploadsService {
         statusCode: 404,
       };
     }
-    return Status.Ok({ uri });
+
+    return Status.Ok(undefined, {
+      "x-wrap-uri": uri,
+    });
   }
 }
