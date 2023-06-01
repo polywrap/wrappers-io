@@ -17,10 +17,6 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - Fn::GetAtt: [ UploadsTable, Arn ]
-        - Effect: "Allow"
-          Action:
-            - "lambda:InvokeFunction"
-          Resource: "*"
   environment:
     UPLOADS_TABLE: ${self:custom.uploadsTable}
     WRAPPERS_GATEWAY_ADMIN_KEY: ${self:custom.wrappersGatewayAdminKey.wrappers_gateway_admin_key}
