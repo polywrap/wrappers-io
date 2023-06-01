@@ -53,12 +53,11 @@ custom:
 plugins:
   - serverless-domain-manager
   - serverless-dynamodb-local
-  - serverless-s3-local
   - serverless-offline
 
 functions:
   verify:
-    handler: ./typescript/functions/gateway/build/index.server.verify
+    handler: ./typescript/functions/service/build/index.server.verify
     runtime: nodejs16.x
     memorySize: 256
     timeout: 10
@@ -66,15 +65,15 @@ functions:
       exclude:
         - ./**
       include:
-        - ./typescript/functions/gateway/build/**
-        - ./typescript/functions/gateway/node_modules/**
+        - ./typescript/functions/service/build/**
+        - ./typescript/functions/service/node_modules/**
     events:
       - http:
           path: u/{user}/verify/{key}/{adminKey}
           method: get
           cors: true
   create:
-    handler: ./typescript/functions/gateway/build/index.server.create
+    handler: ./typescript/functions/service/build/index.server.create
     runtime: nodejs16.x
     memorySize: 256
     timeout: 10
@@ -82,15 +81,15 @@ functions:
       exclude:
         - ./**
       include:
-        - ./typescript/functions/gateway/build/**
-        - ./typescript/functions/gateway/node_modules/**
+        - ./typescript/functions/service/build/**
+        - ./typescript/functions/service/node_modules/**
     events:
       - http:
           path: u/{user}/{adminKey}
           method: post
           cors: true
   delete:
-    handler: ./typescript/functions/gateway/build/index.server.delete
+    handler: ./typescript/functions/service/build/index.server.delete
     runtime: nodejs16.x
     memorySize: 256
     timeout: 10
@@ -98,15 +97,15 @@ functions:
       exclude:
         - ./**
       include:
-        - ./typescript/functions/gateway/build/**
-        - ./typescript/functions/gateway/node_modules/**
+        - ./typescript/functions/service/build/**
+        - ./typescript/functions/service/node_modules/**
     events:
       - http:
           path: u/{user}/{adminKey}
           method: delete
           cors: true
   restore:
-    handler: ./typescript/functions/gateway/build/index.server.restore
+    handler: ./typescript/functions/service/build/index.server.restore
     runtime: nodejs16.x
     memorySize: 256
     timeout: 10
@@ -114,15 +113,15 @@ functions:
       exclude:
         - ./**
       include:
-        - ./typescript/functions/gateway/build/**
-        - ./typescript/functions/gateway/node_modules/**
+        - ./typescript/functions/service/build/**
+        - ./typescript/functions/service/node_modules/**
     events:
       - http:
           path: u/{user}/restore/{adminKey}
           method: post
           cors: true
   get:
-    handler: ./typescript/functions/gateway/build/index.server.get
+    handler: ./typescript/functions/service/build/index.server.get
     runtime: nodejs16.x
     memorySize: 256
     timeout: 10
@@ -130,8 +129,8 @@ functions:
       exclude:
         - ./**
       include:
-        - ./typescript/functions/gateway/build/**
-        - ./typescript/functions/gateway/node_modules/**
+        - ./typescript/functions/service/build/**
+        - ./typescript/functions/service/node_modules/**
     events:
       - http:
           path: u/{user}/info/{adminKey}

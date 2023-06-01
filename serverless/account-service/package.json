@@ -7,10 +7,10 @@
     "build": "yarn build:typescript && npx serverless package",
     "deploy": "npx serverless deploy",
     "test": "npx serverless invoke local -f home",
-    "build:typescript": "yarn build:gateway",
-    "build:gateway": "yarn --cwd ./typescript/functions/gateway build",
-    "install:typescript": "yarn install:gateway",
-    "install:gateway": "yarn --cwd ./typescript/functions/gateway",
+    "build:typescript": "yarn build:service",
+    "build:service": "yarn --cwd ./typescript/functions/service build",
+    "install:typescript": "yarn install:service",
+    "install:service": "yarn --cwd ./typescript/functions/service",
     "dev": "yarn build:typescript && yarn serverless offline start"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import { Account } from "./Account";
-import { IDb } from "./IDb.1";
+import { IDb } from "./IDb";
 import { IResponse } from "./IResponse";
 import { Status } from "./Status";
 
