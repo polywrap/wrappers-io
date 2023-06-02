@@ -1,11 +1,9 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDb, HttpResponse, IDb, RepositoryBase } from "serverless-utils";
-import { Package } from "./types/Package";
 import { FunctionManager } from "./functions/FunctionManager";
 import { Result, ResultErr, ResultOk } from "@polywrap/result";
 import { ENV_VARS, EnvVars } from "./envs";
-import { AccountService } from "./services/AccountService";
-import { PackageService } from "./services/PackageService";
+import { Account } from "./types/Account";
 
 const initializeDependencies = (): Result<{functionManager: FunctionManager, envVars: EnvVars}, HttpResponse> => {
   const envVars: any = {};
@@ -22,13 +20,12 @@ const initializeDependencies = (): Result<{functionManager: FunctionManager, env
 
   const dynamoDbClient = getDynamoDbClient();
 
-  const packagesDb = new DynamoDb(dynamoDbClient, envVars.PACKAGES_TABLE);
-  const packageRepository = new RepositoryBase<Package>(packagesDb, "name");
-  const accountService = new AccountService(envVars.ACCOUNT_SERVICE_URI, envVars.WRAPPERS_GATEWAY_ADMIN_KEY);
+  const accountsDb = new DynamoDb(dynamoDbClient, envVars.ACCOUNTS_TABLE);
+  const accountRepository = new RepositoryBase<Account>(accountsDb, "name");
 
   const functionManager = new FunctionManager(
-    new PackageService(packageRepository), 
-    accountService
+    accountRepository,
+    envVars.WRAPPERS_GATEWAY_ADMIN_KEY
   );
 
   return ResultOk({functionManager, envVars: envVars as EnvVars});

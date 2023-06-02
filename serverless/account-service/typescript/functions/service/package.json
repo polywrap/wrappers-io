@@ -16,11 +16,13 @@
     "test": "jest --passWithNoTests --runInBand --detectOpenHandles --verbose"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.254.0"
+    "@aws-sdk/client-dynamodb": "3.254.0",
+    "@polywrap/result": "^0.10.1",
+    "serverless-utils": "file:../../../../utils/serverless-utils"
   },
   "devDependencies": {
-    "@types/node": "16.11.11",
     "@types/jest": "26.0.8",
+    "@types/node": "16.11.11",
     "jest": "27.1.1",
     "ts-jest": "27.0.5",
     "ts-node": "10.3.0",
