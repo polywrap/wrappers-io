@@ -1,6 +1,7 @@
 import { setupRoute } from "../setup";
 import { EnvVars } from "../envs";
 import { FunctionManager } from "../functions/FunctionManager";
+import { buildParseRouteEvent } from "serverless-utils";
 
 const pathParameters = ["user", "packageAndVersion"] as const;
 const queryParameters = [] as const;
@@ -14,8 +15,8 @@ const handler = async (event: RouteEvent, functionManager: FunctionManager, envV
   return functionManager.resolve(user, packageAndVersion);
 };
 
-export const resolve = (event: any, context: any): Promise<any> => {
-  return setupRoute(event, context, handler, parse);
+export const rawHandler = (event: any, context: any): Promise<any> => {
+  return setupRoute(event, context, handler, buildParseRouteEvent(pathParameters, queryParameters, headers));
 };
 
 type PathParameters = {
@@ -33,30 +34,4 @@ type RouteEvent = {
   queryParameters: QueryParameters,
   headers: Headers,
   body: Body,
-};
-
-function parse(event: any): RouteEvent {
-  const typePathParams: any = {};
-  for (const param of pathParameters) {
-    typePathParams[param] = event.pathParameters[param];
-  }
-
-  const typedQueryParams: any = {};
-  for (const param of queryParameters) {
-    typedQueryParams[param] = event.queryStringParameters[param];
-  }
-
-  const typedHeaders: any = {};
-  for (const header of headers) {
-    typedHeaders[header] = event.headers[header];
-  }
-
-  const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body;
-
-  return {
-    pathParameters: typePathParams,
-    queryParameters: typedQueryParams,
-    headers: typedHeaders,
-    body: JSON.parse(body),
-  } as RouteEvent;
 };
