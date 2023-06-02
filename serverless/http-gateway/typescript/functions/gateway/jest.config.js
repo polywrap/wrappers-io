@@ -5,8 +5,7 @@ module.exports = {
   testMatch: ["**/?(*.)+(spec|test).[jt]s?(x)"],
   globals: {
     'ts-jest': {
-      diagnostics: false,
-      isolatedModules: true
+      diagnostics: false
     }
   }
 };
