@@ -1,3 +1,6 @@
-import { Server } from "./Server";
+import { publish, resolve } from "./routes";
 
-export const server = new Server();
+export const server = {
+  publish,
+  resolve
+};
