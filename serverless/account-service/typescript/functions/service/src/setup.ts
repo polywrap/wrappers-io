@@ -15,10 +15,10 @@ const initializeDependencies = (): Result<{functionManager: FunctionManager, env
   const dynamoDbClient = getDynamoDbClient();
 
   const accountsDb = new DynamoDb(dynamoDbClient, envVars.ACCOUNTS_TABLE);
-  const accountRepository = new RepositoryBase<Account>(accountsDb, "name");
+  const accountRepo = new RepositoryBase<Account>(accountsDb, "name");
 
   const functionManager = new FunctionManager(
-    accountRepository,
+    accountRepo,
     envVars.WRAPPERS_GATEWAY_ADMIN_KEY
   );
 

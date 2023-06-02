@@ -17,11 +17,11 @@ const initializeDependencies = (): Result<{functionManager: FunctionManager, env
   const dynamoDbClient = getDynamoDbClient();
 
   const packagesDb = new DynamoDb(dynamoDbClient, envVars.PACKAGES_TABLE);
-  const packageRepository = new RepositoryBase<Package>(packagesDb, "name");
+  const packageRepo = new RepositoryBase<Package>(packagesDb, "name");
   const accountService = new AccountService(envVars.ACCOUNT_SERVICE_URI, envVars.WRAPPERS_GATEWAY_ADMIN_KEY);
 
   const functionManager = new FunctionManager(
-    new PackageService(packageRepository), 
+    new PackageService(packageRepo), 
     accountService
   );
 

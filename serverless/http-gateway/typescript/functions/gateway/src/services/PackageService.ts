@@ -3,7 +3,7 @@ import { getLatest, sortVersions } from "semver";
 import { Package } from "../types/Package";
 
 export class PackageService {
-  constructor(private readonly packageRepository: IRepository<Package>) { }
+  constructor(private readonly packageRepo: IRepository<Package>) { }
 
   async publish(
     user: string,
@@ -17,7 +17,7 @@ export class PackageService {
 
     const key = `${user}/${packageName}`;
 
-    let savedPackage = await this.packageRepository.read(key);
+    let savedPackage = await this.packageRepo.read(key);
 
     if (!savedPackage) {
       savedPackage = {
@@ -28,7 +28,7 @@ export class PackageService {
 
     savedPackage.versions.push({ name: requiredVersion, uri: uri as string });
 
-    await this.packageRepository.save(savedPackage);
+    await this.packageRepo.save(savedPackage);
 
     return HttpResponse.Ok({ message: `Published: ${uri}` });
   }
@@ -40,7 +40,7 @@ export class PackageService {
   ): Promise<any> {
     const key = `${user}/${packageName}`;
 
-    let savedPackage = await this.packageRepository.read(key);
+    let savedPackage = await this.packageRepo.read(key);
 
     let uri = undefined;
 
