@@ -3,7 +3,7 @@ import { AccountService } from "../services/AccountService";
 import { PackageService } from "../services/PackageService";
 
 export class FunctionManager {
-  constructor(private readonly uploadsService: PackageService, private readonly accountService: AccountService) {}
+  constructor(private readonly packageService: PackageService, private readonly accountService: AccountService) {}
 
   async publish(
     user: string,
@@ -23,7 +23,7 @@ export class FunctionManager {
       return HttpResponse.NotFound();
     }
 
-    return this.uploadsService.publish(user, packageName, uri, version);
+    return this.packageService.publish(user, packageName, uri, version);
   }
 
   async resolve(
@@ -36,6 +36,6 @@ export class FunctionManager {
       return HttpResponse.ServerError("Error: Missing User or Package Name");
     }
 
-    return this.uploadsService.resolve(user, packageName, version);
+    return this.packageService.resolve(user, packageName, version);
   }
 }
