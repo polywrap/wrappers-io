@@ -54,7 +54,7 @@ plugins:
 
 functions:
   publish:
-    handler: ./typescript/functions/gateway/build/index.server.publish
+    handler: ./typescript/functions/service/build/index.server.publish
     runtime: nodejs16.x
     memorySize: 256
     timeout: 10
@@ -62,15 +62,15 @@ functions:
       exclude:
         - ./**
       include:
-        - ./typescript/functions/gateway/build/**
-        - ./typescript/functions/gateway/node_modules/**
+        - ./typescript/functions/service/build/**
+        - ./typescript/functions/service/node_modules/**
     events:
       - http:
           path: u/{user}/{packageAndVersion}
           method: post
           cors: true
   resolve:
-    handler: ./typescript/functions/gateway/build/index.server.resolve
+    handler: ./typescript/functions/service/build/index.server.resolve
     runtime: nodejs16.x
     memorySize: 256
     timeout: 10
@@ -78,8 +78,8 @@ functions:
       exclude:
         - ./**
       include:
-        - ./typescript/functions/gateway/build/**
-        - ./typescript/functions/gateway/node_modules/**
+        - ./typescript/functions/service/build/**
+        - ./typescript/functions/service/node_modules/**
     events:
       - http:
           path: u/{user}/{packageAndVersion}/{filePath}
