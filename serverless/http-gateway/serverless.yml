@@ -51,6 +51,7 @@ plugins:
   - serverless-domain-manager
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-rust
 
 functions:
   publish:
@@ -80,6 +81,19 @@ functions:
       include:
         - ./typescript/functions/gateway/build/**
         - ./typescript/functions/gateway/node_modules/**
+    events:
+      - http:
+          path: u/{user}/{packageAndVersion}/{filePath}
+          method: get
+          cors: true
+  rresolve:
+    handler: home
+    runtime: rust
+    package:
+      exclude:
+        - /**
+      include:
+        - ./rust/resolve/**
     events:
       - http:
           path: u/{user}/{packageAndVersion}/{filePath}
