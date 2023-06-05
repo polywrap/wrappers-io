@@ -1,4 +1,6 @@
-import { verify, getLatest, sortVersions } from "../src/semver";
+import { getLatest } from "../getLatest";
+import { sortVersions } from "../sortVersions";
+import { verify } from "../verify";
 
 describe('Semantic Versioning functions', () => {
     const versionObjects = [

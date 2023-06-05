@@ -16,9 +16,9 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - Fn::GetAtt: [ UploadsTable, Arn ]
+            - Fn::GetAtt: [ packagesTable, Arn ]
   environment:
-    UPLOADS_TABLE: ${self:custom.uploadsTable}
+    PACKAGES_TABLE: ${self:custom.packagesTable}
     WRAPPERS_GATEWAY_ADMIN_KEY: ${self:custom.wrappersGatewayAdminKey.wrappers_gateway_admin_key}
     ACCOUNT_SERVICE_URI: https://accounts.wrappers.dev
 
@@ -44,7 +44,7 @@ custom:
       heapInitial: 200m
       heapMax: 1g
       migrate: true
-  uploadsTable: 'uploads-table-${sls:stage}'
+  packagesTable: 'packages-table-${sls:stage}'
   wrappersGatewayAdminKey: ${ssm:/aws/reference/secretsmanager/wrappers-gateway-admin-key}
 
 plugins:
@@ -66,7 +66,7 @@ functions:
         - ./typescript/functions/gateway/node_modules/**
     events:
       - http:
-          path: u/{user}/{package}
+          path: u/{user}/{packageAndVersion}
           method: post
           cors: true
   resolve:
@@ -82,12 +82,12 @@ functions:
         - ./typescript/functions/gateway/node_modules/**
     events:
       - http:
-          path: u/{user}/{package}/{filePath}
+          path: u/{user}/{packageAndVersion}/{filePath}
           method: get
           cors: true
 resources:
   Resources:
-    UploadsTable:
+    packagesTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
@@ -97,4 +97,4 @@ resources:
           - AttributeName: name
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:custom.uploadsTable}
+        TableName: ${self:custom.packagesTable}

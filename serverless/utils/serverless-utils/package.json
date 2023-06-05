@@ -1,10 +1,10 @@
 {
-  "name": "wrappers-http-gateway-publish",
+  "name": "serverless-utils",
   "version": "0.1.0",
   "main": "build/index.js",
   "author": "nerfZael",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "type": "commonjs",
   "repository": {
     "type": "git",
@@ -16,11 +16,7 @@
     "test": "jest --passWithNoTests --runInBand --detectOpenHandles --verbose"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.254.0",
-    "@polywrap/result": "0.10.1",
-    "axios": "1.4.0",
-    "semver": "file:../../../../utils/semver",
-    "serverless-utils": "file:../../../../utils/serverless-utils"
+    "@aws-sdk/client-dynamodb": "3.254.0"
   },
   "devDependencies": {
     "@types/jest": "26.0.8",

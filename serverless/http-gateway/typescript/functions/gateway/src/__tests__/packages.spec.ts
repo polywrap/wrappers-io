@@ -1,19 +1,19 @@
-import { InMemoryDb } from "../src/InMemoryDb";
-import { InternalServer } from "../src/InternalServer";
-import { UploadsService } from "../src/UploadsService";
-import { Version } from "../src/Version";
+import { IRepository, InMemoryDb, RepositoryBase } from "serverless-utils";
+import { Package } from "../types/Package";
+import { Version } from "../types/Version";
+import { PackageService } from "../services/PackageService";
 
 describe('Server', () => {
-  let dbMock: InMemoryDb;
-  let service: UploadsService;
-  ;
+  let packageRepo: IRepository<Package>;
+  let service: PackageService;
 
   beforeEach(() => {
-    dbMock = new InMemoryDb();
-    service = new UploadsService(dbMock);
+    const dbMock = new InMemoryDb();
+    packageRepo = new RepositoryBase<Package>(dbMock, "name");
+    service = new PackageService(packageRepo);
   });
 
-  describe('_publish', () => {
+  describe('publish', () => {
     it('should save new version correctly', async () => {
       const user = 'user';
       const packageName = 'package';
@@ -22,8 +22,11 @@ describe('Server', () => {
 
       await service.publish(user, packageName, uri, version);
 
-      const savedVersions = await dbMock.read<Version[]>('name', `${user}/${packageName}`);
-      expect(savedVersions).toEqual([{ name: version, uri }]);
+      const savedPackage = await packageRepo.read(`${user}/${packageName}`);
+      expect(savedPackage).toEqual({
+        name: `${user}/${packageName}`,
+        versions: [{ name: version, uri }]
+      });
     });
 
     it('should save multiple versions', async () => {
@@ -37,8 +40,11 @@ describe('Server', () => {
       await service.publish(user, packageName, uri1, version1);
       await service.publish(user, packageName, uri2, version2);
 
-      const savedVersions = await dbMock.read<Version[]>('name', `${user}/${packageName}`);
-      expect(savedVersions).toEqual([{ name: version1, uri: uri1 }, { name: version2, uri: uri2 }]);
+      const savedPackage = await packageRepo.read(`${user}/${packageName}`);
+      expect(savedPackage).toEqual({
+        name: `${user}/${packageName}`,
+        versions: [{ name: version1, uri: uri1 }, { name: version2, uri: uri2 }]
+      });
     });
   });
 
@@ -49,12 +55,14 @@ describe('Server', () => {
       const version1: Version = { name: '1.0.0', uri: 'uri1' };
       const version2: Version = { name: '2.0.0', uri: 'uri2' };
 
-      // first publish versions
-      await dbMock.save('name', `${user}/${packageName}`, [version1, version2]);
+      await packageRepo.save({
+        name: `${user}/${packageName}`,
+        versions: [version1, version2]
+      });
 
       const result = await service.resolve(user, packageName);
 
-      expect(result).toEqual({ statusCode: 200, body: { uri: version2.uri } });
+      expect(result).toEqual({ statusCode: 200, headers: { "x-wrap-uri": version2.uri } });
     });
 
     it('should return the specified version', async () => {
@@ -63,12 +71,14 @@ describe('Server', () => {
       const version1: Version = { name: '1.0.0', uri: 'uri1' };
       const version2: Version = { name: '2.0.0', uri: 'uri2' };
 
-      // first publish versions
-      await dbMock.save('name', `${user}/${packageName}`, [version1, version2]);
+      await packageRepo.save({
+        name: `${user}/${packageName}`,
+        versions: [version1, version2]
+      });
 
       const result = await service.resolve(user, packageName, version1.name);
 
-      expect(result).toEqual({ statusCode: 200, body: { uri: version1.uri } });
+      expect(result).toEqual({ statusCode: 200, headers: { "x-wrap-uri": version1.uri } });
     });
 
     it('should return 404 if package not found', async () => {
