@@ -62,7 +62,7 @@ function getDynamoDbClient(): DynamoDBClient {
   if (process.env.IS_OFFLINE) {
     return new DynamoDBClient({
       region: "localhost",
-      endpoint: "http://localhost:8001",
+      endpoint: "http://localhost:8002",
       credentials: {
         accessKeyId: "DEFAULT_ACCESS_KEY",
         secretAccessKey: "DEFAULT_SECRET",

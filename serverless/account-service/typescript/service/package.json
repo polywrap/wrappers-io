@@ -1,5 +1,5 @@
 {
-  "name": "wrappers-http-gateway-publish",
+  "name": "wrappers-account-service",
   "version": "0.1.0",
   "main": "build/index.js",
   "author": "nerfZael",
@@ -18,9 +18,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.254.0",
     "@polywrap/result": "0.10.1",
-    "axios": "1.4.0",
-    "semver": "file:../../../../utils/semver",
-    "serverless-utils": "file:../../../../utils/serverless-utils"
+    "serverless-utils": "file:../../../utils/serverless-utils"
   },
   "devDependencies": {
     "@types/jest": "26.0.8",
