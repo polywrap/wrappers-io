@@ -2,7 +2,7 @@ import { HttpResponse, IHttpResponse, IRepository } from "serverless-utils";
 import { Account } from "../types/Account";
 
 export class FunctionManager {
-  constructor(private readonly accountsRepository: IRepository<Account>, private readonly adminKey: string) {
+  constructor(private readonly accountRepo: IRepository<Account>, private readonly adminKey: string) {
   }
 
   async verify(name: string, key: string, adminKey: string): Promise<IHttpResponse> {
@@ -10,7 +10,7 @@ export class FunctionManager {
       return HttpResponse.NotFound();
     }
 
-    const account = await this.accountsRepository.read(name);
+    const account = await this.accountRepo.read(name);
     if (account && account.apiKey === key) {
       return HttpResponse.Ok({ message: "Verified." });
     } else {
@@ -26,7 +26,7 @@ export class FunctionManager {
     const apiKey = Math.random().toString(36).substring(2, 15);
     const account: Account = { name, apiKey, isDeleted: false };
 
-    await this.accountsRepository.save(account);
+    await this.accountRepo.save(account);
 
     return HttpResponse.Ok({ message: "Account created.", apiKey });
   }
@@ -35,7 +35,7 @@ export class FunctionManager {
     if (adminKey !== this.adminKey) {
       return HttpResponse.NotFound();
     }
-    const account = await this.accountsRepository.read(name);
+    const account = await this.accountRepo.read(name);
 
     if (!account) {
       return HttpResponse.NotFound();
@@ -43,7 +43,7 @@ export class FunctionManager {
 
     account.isDeleted = true,
 
-    await this.accountsRepository.save(account);
+    await this.accountRepo.save(account);
 
     return HttpResponse.Ok(undefined);
   }
@@ -52,7 +52,7 @@ export class FunctionManager {
     if (adminKey !== this.adminKey) {
       return HttpResponse.NotFound();
     }
-    const account = await this.accountsRepository.read(name);
+    const account = await this.accountRepo.read(name);
 
     if (!account) {
       return HttpResponse.NotFound();
@@ -60,7 +60,7 @@ export class FunctionManager {
 
     account.isDeleted = false,
 
-    await this.accountsRepository.save(account);
+    await this.accountRepo.save(account);
     
     return HttpResponse.Ok(undefined);
   }
@@ -70,7 +70,7 @@ export class FunctionManager {
       return HttpResponse.NotFound();
     }
 
-    const account = await this.accountsRepository.read(name);
+    const account = await this.accountRepo.read(name);
 
     if (account) {
       return HttpResponse.Ok(account);

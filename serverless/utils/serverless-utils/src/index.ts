@@ -5,3 +5,4 @@ export * from './RepositoryBase';
 export * from './IRepository';
 export * from './IDb';
 export * from './InMemoryDb';
+export * from './buildParseRouteEvent';
