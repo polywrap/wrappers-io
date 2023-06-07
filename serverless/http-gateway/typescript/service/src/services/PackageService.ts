@@ -15,6 +15,10 @@ export enum ResolveError {
   VersionNotFound = "Package version not found",
 }
 
+export enum GetError {
+  PackageNotFound = "Package not found",
+}
+
 export class PackageService {
   constructor(private readonly packageRepo: IRepository<Package>) { }
 
@@ -38,6 +42,7 @@ export class PackageService {
 
     if (!savedPackage) {
       savedPackage = {
+        user,
         name: key,
         versions: [],
       };
@@ -118,5 +123,20 @@ export class PackageService {
   
       return ResultOk(uri);
     } 
+  }
+
+  async get(
+    user: string,
+    packageName: string,
+  ): Promise<Result<Package, GetError>> {
+    const key = `${user}/${packageName}`;
+
+    let savedPackage = await this.packageRepo.read(key);
+
+    if (!savedPackage) {
+      return ResultErr(GetError.PackageNotFound);
+    }
+
+    return ResultOk(savedPackage);
   }
 }

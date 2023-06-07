@@ -1,4 +1,4 @@
-import { PackageService, PublishError, ResolveError } from "../services/PackageService";
+import { GetError, PackageService, PublishError, ResolveError } from "../services/PackageService";
 import { IAccountService } from "../services/IAccountService";
 import { HttpResponse } from "serverless-utils";
 import { FunctionManager } from "../functions/FunctionManager";
@@ -13,6 +13,7 @@ describe("FunctionManager", () => {
     packageService = {
       publish: jest.fn(),
       resolve: jest.fn(),
+      get: jest.fn(),
     } as any;
 
     accountService = {
@@ -190,6 +191,68 @@ describe("FunctionManager", () => {
       const response = await functionManager.resolve("user", "package@1.0.0");
 
       expect(response).toEqual(HttpResponse.NotFound());
+    });
+  });
+
+  describe("packageInfo", () => {
+    it("should return an error when user or package name is missing", async () => {
+      expect(
+        await functionManager.packageInfo("", "package")
+      ).toEqual(HttpResponse.ServerError("Error: Missing User or Package Name"));
+      expect(
+        await functionManager.packageInfo("user", "")
+      ).toEqual(HttpResponse.ServerError("Error: Missing User or Package Name"));
+    });
+
+    it("should return OK and info when package exists", async () => {
+      const packageInfo = {
+        name: "package",
+        user: "user",
+        versions: [
+          {
+            name: "1.0.0",
+            uri: "uri1"
+          }
+        ]
+      };
+     
+      packageService.get.mockImplementationOnce((user: string, packageName: string) => {
+        if (user == packageInfo.user && packageName == packageInfo.name) {
+          return Promise.resolve(ResultOk(packageInfo));
+        } else {
+          throw new Error("Unexpected call");
+        }
+      });
+
+      const response = await functionManager.packageInfo(packageInfo.user, packageInfo.name);
+
+      expect(response).toEqual(HttpResponse.Ok(packageInfo));
+    });
+
+
+    it("should return error when package does not exist", async () => {
+      const packageInfo = {
+        name: "package",
+        user: "user",
+        versions: [
+          {
+            name: "1.0.0",
+            uri: "uri1"
+          }
+        ]
+      };
+     
+      packageService.get.mockImplementationOnce((user: string, packageName: string) => {
+        if (user == packageInfo.user && packageName == "package2") {
+          return Promise.resolve(ResultErr(GetError.PackageNotFound));
+        } else {
+          throw new Error("Unexpected call");
+        }
+      });
+
+      const response = await functionManager.packageInfo(packageInfo.user, "package2");
+
+      expect(response).toEqual(HttpResponse.NotFound());      
     });
   });
 });
