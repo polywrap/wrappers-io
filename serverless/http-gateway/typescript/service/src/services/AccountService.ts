@@ -1,6 +1,7 @@
 import axios from "axios";
+import { IAccountService } from "./IAccountService";
 
-export class AccountService {
+export class AccountService implements IAccountService {
   constructor(private readonly accountServiceUri: string, private readonly adminKey: string) { }
   
   async verify(user: string, apiKey: string | undefined): Promise<boolean> {

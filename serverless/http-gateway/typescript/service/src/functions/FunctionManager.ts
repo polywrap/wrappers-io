@@ -1,9 +1,9 @@
 import { HttpResponse, IHttpResponse } from "serverless-utils";
-import { AccountService } from "../services/AccountService";
-import { PackageService } from "../services/PackageService";
+import { IAccountService } from "../services/IAccountService";
+import { PackageService, PublishError, ResolveError } from "../services/PackageService";
 
 export class FunctionManager {
-  constructor(private readonly packageService: PackageService, private readonly accountService: AccountService) {}
+  constructor(private readonly packageService: PackageService, private readonly accountService: IAccountService) {}
 
   async publish(
     user: string,
@@ -23,7 +23,22 @@ export class FunctionManager {
       return HttpResponse.NotFound();
     }
 
-    return this.packageService.publish(user, packageName, uri, version);
+    const result = await this.packageService.publish(user, packageName, uri, version);
+
+    if (result.ok) {
+      return HttpResponse.Ok();
+    }
+
+    switch (result.error) {
+      case PublishError.InvalidVersionFormat:
+        return HttpResponse.BadRequest("Invalid Version Format");
+      case PublishError.DuplicateVersion:
+        return HttpResponse.BadRequest("Invalid Version Format");
+      case PublishError.LatestVersionNotAllowed:
+        return HttpResponse.BadRequest("Invalid Version Format");
+      default:
+        return HttpResponse.ServerError("Error: Unknown Error from Package Service");
+    }
   }
 
   async resolve(
@@ -36,6 +51,21 @@ export class FunctionManager {
       return HttpResponse.ServerError("Error: Missing User or Package Name");
     }
 
-    return this.packageService.resolve(user, packageName, version);
+    const result = await this.packageService.resolve(user, packageName, version);
+
+    console.log("result", result);
+
+    if (result.ok) {
+      return HttpResponse.Ok({ uri: result.value });
+    }
+
+    switch (result.error) {
+      case ResolveError.PackageNotFound:
+        return HttpResponse.NotFound();
+      case ResolveError.VersionNotFound:
+        return HttpResponse.NotFound();
+      default:
+        return HttpResponse.ServerError("Error: Unknown Error from Package Service");
+    }
   }
 }
