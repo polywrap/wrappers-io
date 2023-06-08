@@ -16,7 +16,6 @@
     "test": "jest --passWithNoTests --runInBand --detectOpenHandles --verbose"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.254.0"
   },
   "devDependencies": {
     "@types/jest": "26.0.8",
