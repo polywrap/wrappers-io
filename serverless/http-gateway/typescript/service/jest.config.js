@@ -7,5 +7,14 @@ module.exports = {
     'ts-jest': {
       diagnostics: false
     }
-  }
+  },
+  "transform": {
+    "^.+\\.tsx?$": "ts-jest"
+  },
+  "moduleFileExtensions": [
+    "ts",
+    "js",
+    "json",
+    "node"
+  ]
 };
