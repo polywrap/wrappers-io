@@ -1,5 +1,5 @@
 import { IRepository } from "serverless-utils"; 
-import { PackageService, PublishError, ResolveError } from "../services/PackageService";
+import { GetError, PackageService, PublishError, ResolveError } from "../services/PackageService";
 import { Package } from "../types/Package";
 
 describe("PackageService", () => {
@@ -18,7 +18,7 @@ describe("PackageService", () => {
     jest.resetAllMocks();
   });
 
-  it("should successfully publish a new package when all fields are provided correctly", async () => {
+  it("should successfully publish a new package", async () => {
     const user = "user1";
     const packageName = "package1";
     const uri = "uri1";
@@ -29,6 +29,7 @@ describe("PackageService", () => {
     const result = await packageService.publish(user, packageName, uri, version);
 
     expect(mockPackageRepo.save).toBeCalledWith({
+      user,
       name: `${user}/${packageName}`,
       versions: [
         {
@@ -51,6 +52,7 @@ describe("PackageService", () => {
     const result = await packageService.publish(user, packageName, uri);
 
     expect(mockPackageRepo.save).toBeCalledWith({
+      user,
       name: `${user}/${packageName}`,
       versions: [
         {
@@ -148,27 +150,6 @@ describe("PackageService", () => {
     const result = await packageService.publish(user, packageName, uri);
 
     expect(result.ok).toEqual(true);
-  });
-
-  it("should successfully save the new package", async () => {
-    const user = "user1";
-    const packageName = "package1";
-    const uri = "uri1";
-    const version = "1.0.0";
-
-    (mockPackageRepo.read as jest.Mock).mockResolvedValueOnce(null);
-
-    await packageService.publish(user, packageName, uri, version);
-
-    expect(mockPackageRepo.save).toBeCalledWith({
-      name: `${user}/${packageName}`,
-      versions: [
-        {
-          name: version,
-          uri: uri,
-        },
-      ],
-    });
   });
 
   it("should resolve the concrete version", async () => {
@@ -396,5 +377,66 @@ describe("PackageService", () => {
     }
 
     expect(result.error).toEqual(ResolveError.PackageNotFound);
+  });
+
+  it("should return the package for 'get' when the package exists", async () => {
+    const packageInfo = {
+      user: "user",
+      name: `packageName`,
+      versions: [
+        {
+          name: "1.0.0",
+          uri: "uri1",
+        },
+      ],
+    };
+
+    (mockPackageRepo.read as jest.Mock).mockImplementationOnce((key: string) => {
+      if (key === `${packageInfo.user}/${packageInfo.name}`) {
+        return Promise.resolve(packageInfo);
+      } else {
+        return Promise.resolve(null);
+      }
+    });
+
+    const result = await packageService.get(packageInfo.user, packageInfo.name);
+
+    expect(result.ok).toEqual(true);
+    if (result.ok !== true) {
+      throw new Error("Expected result.ok to be true");
+    }
+
+    expect(result.value).toEqual(packageInfo);
+  });
+
+  it("should return an error for 'get' when the package is not found", async () => {
+    const user = "user1";
+    const packageName = "package1";
+    const uri = "uri1";
+
+    (mockPackageRepo.read as jest.Mock).mockImplementationOnce((key: string) => {
+      if (key === `${user}/${packageName}`) {
+        return Promise.resolve({
+          name: `${user}/${packageName}`,
+          versions: [
+            {
+              name: "1.0.0",
+              uri,
+            },
+          ],
+        });
+      } else {
+        return Promise.resolve(null);
+      }
+    });
+
+    const result = await packageService.get(user, "other-package");
+
+    expect(result.ok).toEqual(false);
+    if (result.ok !== false) {
+      throw new Error("Expected result.ok to be false");
+    }
+
+    expect(result.error).toEqual(GetError.PackageNotFound);
   });
 });

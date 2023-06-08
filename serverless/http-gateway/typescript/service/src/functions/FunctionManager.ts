@@ -1,6 +1,6 @@
 import { HttpResponse, IHttpResponse } from "serverless-utils";
 import { IAccountService } from "../services/IAccountService";
-import { PackageService, PublishError, ResolveError } from "../services/PackageService";
+import { GetError, PackageService, PublishError, ResolveError } from "../services/PackageService";
 
 export class FunctionManager {
   constructor(private readonly packageService: PackageService, private readonly accountService: IAccountService) {}
@@ -53,8 +53,6 @@ export class FunctionManager {
 
     const result = await this.packageService.resolve(user, packageName, version);
 
-    console.log("result", result);
-
     if (result.ok) {
       return HttpResponse.Ok({ uri: result.value });
     }
@@ -63,6 +61,28 @@ export class FunctionManager {
       case ResolveError.PackageNotFound:
         return HttpResponse.NotFound();
       case ResolveError.VersionNotFound:
+        return HttpResponse.NotFound();
+      default:
+        return HttpResponse.ServerError("Error: Unknown Error from Package Service");
+    }
+  }
+
+  async packageInfo(
+    user: string,
+    packageName: string,
+  ): Promise<IHttpResponse> {
+    if (!user || !packageName) {
+      return HttpResponse.ServerError("Error: Missing User or Package Name");
+    }
+
+    const result = await this.packageService.get(user, packageName);
+
+    if (result.ok) {
+      return HttpResponse.Ok(result.value);
+    }
+
+    switch (result.error) {
+      case GetError.PackageNotFound:
         return HttpResponse.NotFound();
       default:
         return HttpResponse.ServerError("Error: Unknown Error from Package Service");

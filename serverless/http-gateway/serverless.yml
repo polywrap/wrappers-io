@@ -85,6 +85,22 @@ functions:
           path: u/{user}/{packageAndVersion}/{filePath}
           method: get
           cors: true
+  packageInfo:
+    handler: ./typescript/service/build/index.server.packageInfo
+    runtime: nodejs16.x
+    memorySize: 256
+    timeout: 10
+    package:
+      exclude:
+        - ./**
+      include:
+        - ./typescript/service/build/**
+        - ./typescript/service/node_modules/**
+    events:
+      - http:
+          path: u/{user}/{package}
+          method: get
+          cors: true
 resources:
   Resources:
     packagesTable:
