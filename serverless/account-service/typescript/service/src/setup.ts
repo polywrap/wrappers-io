@@ -4,6 +4,7 @@ import { FunctionManager } from "./functions/FunctionManager";
 import { Result, ResultErr, ResultOk } from "@polywrap/result";
 import { ENV_VARS, EnvVars } from "./envs";
 import { Account } from "./types/Account";
+import { AccountService } from "./services/AccountService";
 
 const initializeDependencies = (): Result<{functionManager: FunctionManager, envVars: EnvVars}, HttpResponse> => {
   const result = setupEnvVars();
@@ -16,9 +17,10 @@ const initializeDependencies = (): Result<{functionManager: FunctionManager, env
 
   const accountsDb = new DynamoDb(dynamoDbClient, envVars.ACCOUNTS_TABLE);
   const accountRepo = new RepositoryBase<Account>(accountsDb, "name");
+  const accountService = new AccountService(accountRepo);
 
   const functionManager = new FunctionManager(
-    accountRepo,
+    accountService,
     envVars.WRAPPERS_GATEWAY_ADMIN_KEY
   );
 

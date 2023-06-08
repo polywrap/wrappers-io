@@ -1,8 +1,8 @@
-import { HttpResponse, IHttpResponse, IRepository } from "serverless-utils";
-import { Account } from "../types/Account";
+import { HttpResponse, IHttpResponse } from "serverless-utils";
+import { AccountService, CreateError, DeleteError, RestoreError, ReadError } from "../services/AccountService";
 
 export class FunctionManager {
-  constructor(private readonly accountRepo: IRepository<Account>, private readonly adminKey: string) {
+  constructor(private readonly accountService: AccountService, private readonly adminKey: string) {
   }
 
   async verify(name: string, key: string, adminKey: string): Promise<IHttpResponse> {
@@ -10,9 +10,10 @@ export class FunctionManager {
       return HttpResponse.NotFound();
     }
 
-    const account = await this.accountRepo.read(name);
-    if (account && account.apiKey === key) {
-      return HttpResponse.Ok({ message: "Verified." });
+    const result = await this.accountService.read(name);
+    
+    if (result.ok && result.value.apiKey === key && !result.value.isDeleted) {
+      return HttpResponse.Ok();
     } else {
       return HttpResponse.NotFound();
     }
@@ -23,46 +24,56 @@ export class FunctionManager {
       return HttpResponse.NotFound();
     }
 
-    const apiKey = Math.random().toString(36).substring(2, 15);
-    const account: Account = { name, apiKey, isDeleted: false };
+    const result = await this.accountService.create(name);
 
-    await this.accountRepo.save(account);
+    if (result.ok) {
+      return HttpResponse.Ok({ message: "Account created.", apiKey: result.value.apiKey });
+    }
 
-    return HttpResponse.Ok({ message: "Account created.", apiKey });
+    switch (result.error) {
+      case CreateError.AccountAlreadyExists:
+        return HttpResponse.Conflict();
+      default:
+        return HttpResponse.ServerError("Account service returned an unknown error");
+    }
   }
 
   async delete(name: string, adminKey: string): Promise<IHttpResponse> {
     if (adminKey !== this.adminKey) {
       return HttpResponse.NotFound();
     }
-    const account = await this.accountRepo.read(name);
 
-    if (!account) {
-      return HttpResponse.NotFound();
+    const result = await this.accountService.delete(name);
+
+    if (result.ok) {
+      return HttpResponse.Ok(undefined);
     }
-
-    account.isDeleted = true,
-
-    await this.accountRepo.save(account);
-
-    return HttpResponse.Ok(undefined);
+    
+    switch (result.error) {
+      case DeleteError.AccountNotFound:
+        return HttpResponse.NotFound();
+      default:
+        return HttpResponse.ServerError("Account service returned an unknown error");
+    }
   }
 
   async restore(name: string, adminKey: string): Promise<IHttpResponse> {
     if (adminKey !== this.adminKey) {
       return HttpResponse.NotFound();
     }
-    const account = await this.accountRepo.read(name);
 
-    if (!account) {
-      return HttpResponse.NotFound();
+    const result = await this.accountService.restore(name);
+    
+    if (result.ok) {
+      return HttpResponse.Ok(undefined);
     }
 
-    account.isDeleted = false,
-
-    await this.accountRepo.save(account);
-    
-    return HttpResponse.Ok(undefined);
+    switch (result.error) {
+      case RestoreError.AccountNotFound:
+        return HttpResponse.NotFound();
+      default:
+        return HttpResponse.ServerError("Account service returned an unknown error");
+    }
   }
 
   async get(name: string, adminKey: string): Promise<IHttpResponse> {
@@ -70,12 +81,17 @@ export class FunctionManager {
       return HttpResponse.NotFound();
     }
 
-    const account = await this.accountRepo.read(name);
+    const result = await this.accountService.read(name);
 
-    if (account) {
-      return HttpResponse.Ok(account);
-    } else {
-      return HttpResponse.NotFound();
+    if (result.ok) {
+      return HttpResponse.Ok(result.value);
+    } 
+
+    switch (result.error) {
+      case ReadError.AccountNotFound:
+        return HttpResponse.NotFound();
+      default:
+        return HttpResponse.ServerError("Account service returned an unknown error");
     }
   }
 }
