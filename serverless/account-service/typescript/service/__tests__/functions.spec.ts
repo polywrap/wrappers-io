@@ -1,6 +1,7 @@
 import { Account } from "../src/types/Account";
 import { FunctionManager } from "../src/functions/FunctionManager";
 import { HttpResponse, IRepository, InMemoryDb, RepositoryBase } from "serverless-utils";
+import { AccountService } from "../src/services/AccountService";
 describe("InternalServer", () => {
   let manager: FunctionManager;
   let accountRepo: IRepository<Account>;
@@ -8,7 +9,8 @@ describe("InternalServer", () => {
   beforeEach(() => {
     const db = new InMemoryDb();
     accountRepo = new RepositoryBase<Account>(db, "name");
-    manager = new FunctionManager(accountRepo, "adminKey");
+    const accountService = new AccountService(accountRepo);
+    manager = new FunctionManager(accountService, "adminKey");
   });
 
   describe("verify", () => {
@@ -27,7 +29,7 @@ describe("InternalServer", () => {
       await accountRepo.save(account);
 
       const response = await manager.verify("test", "key", "adminKey");
-      expect(response).toEqual(HttpResponse.Ok({ message: "Verified." }));
+      expect(response).toEqual(HttpResponse.Ok());
     });
   });
 

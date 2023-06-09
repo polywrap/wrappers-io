@@ -33,4 +33,14 @@ export class HttpResponse {
       headers
     } as IHttpResponse;
   }
+
+  static Conflict(message?: string, headers?: Record<string, string>) {
+    return {
+      statusCode: 409,
+      body: {
+        message
+      },
+      headers
+    } as IHttpResponse;
+  }
 }
