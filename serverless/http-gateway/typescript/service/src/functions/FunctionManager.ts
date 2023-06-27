@@ -54,7 +54,9 @@ export class FunctionManager {
     const result = await this.packageService.resolve(user, packageName, version);
 
     if (result.ok) {
-      return HttpResponse.Ok({ uri: result.value });
+      return HttpResponse.Ok(undefined, {
+        "x-wrap-uri": result.value,
+      });
     }
 
     switch (result.error) {
